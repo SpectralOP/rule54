@@ -1,0 +1,66 @@
+name: Kernel-prove equivalent direct database lookup
+on:
+  push:
+    branches: [kernel-verification]
+    paths: [.github/workflows/fast-kernel-db.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  equivalent-lookup:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+        with: {persist-credentials: false}
+      - name: Verify exact inputs and extract sources
+        run: |
+          python3 - <<'PY'
+          import hashlib
+          from pathlib import Path
+          for name,expected in [('rule54_lean_formalization.zip','fd9f9788f83e44eed7aeaeeb96def5b605c2b98e2eba6e641b4618cd1fea3ef4'),('kernel-full-conversion.zip','b47d0af50ceeac2c69ece6efba9f844520ee6efa69bda2a6c1d11b42fefa35e1')]:
+              assert hashlib.sha256(Path(name).read_bytes()).hexdigest()==expected,name
+          PY
+          unzip -q rule54_lean_formalization.zip
+          unzip -qo kernel-full-conversion.zip -d rule54_lean_formalization
+          cp kernel_fast_db.py rule54_lean_formalization/
+      - uses: actions/download-artifact@v4
+        with:
+          name: full-kernel-base
+          run-id: 44566749794
+          github-token: ${{ github.token }}
+          path: rule54_lean_formalization
+      - uses: actions/download-artifact@v4
+        with:
+          name: full-kernel-certified
+          run-id: 44578522410
+          github-token: ${{ github.token }}
+          path: rule54_lean_formalization
+      - name: Install pinned Lean and restore checked proof modules
+        run: |
+          set -euo pipefail
+          curl -fL --retry 3 https://github.com/leanprover/lean4/releases/download/v4.23.0/lean-4.23.0-linux.tar.zst | tar --zstd -xf -
+          echo "$GITHUB_WORKSPACE/lean-4.23.0-linux/bin" >> "$GITHUB_PATH"
+          for f in rule54_lean_formalization/*.tar.zst; do tar --zstd -xf "$f" -C rule54_lean_formalization; done
+      - name: Prove equality of every lookup function and retain database validity
+        working-directory: rule54_lean_formalization
+        run: |
+          set -euo pipefail
+          python3 kernel_fast_db.py prepare
+          python3 kernel_fast_db.py build 2>&1 | tee fast-lookup-verification.log
+          python3 kernel_fast_db.py pack
+      - uses: actions/upload-artifact@v4
+        with:
+          name: kernel-fast-db
+          path: rule54_lean_formalization/kernel-fast-db.tar.zst
+          retention-days: 7
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: fast-lookup-evidence
+          path: |
+            rule54_lean_formalization/fast-lookup-verification.log
+            rule54_lean_formalization/KernelFastDB.lean
+            rule54_lean_formalization/kernel-logs
+          retention-days: 7
