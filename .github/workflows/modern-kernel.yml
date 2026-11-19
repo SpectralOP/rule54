@@ -45,7 +45,7 @@ jobs:
               p.write_text(text)
           for p in [Path('Rule54FastProbe.lean'), *Path('.').glob('FastCase*Case.lean'), *Path('.').glob('FastCase*Nodes.lean')]:
               text=p.read_text()
-              text='import Lean\n'+text
+              text='import Lean\nset_option cbv.maxSteps 100000000\n'+text
               text=text.replace('maxHeartbeats 5000000','maxHeartbeats 0')
               text=text.replace('by decide +kernel','by decide_cbv')
               text=text.replace('by\n  simp [fixture, Manifest.writer, Manifest.ceilPow, Nat.log2]\n  decide +kernel','by decide_cbv')
