@@ -37,25 +37,77 @@ jobs:
           assert sum(j['name'].startswith('nodes (') and j['conclusion']=='success' for j in original_jobs)==16
           recovery=get('/actions/runs/44578522410')
           assert recovery['head_sha']=='7fb60ce8a4d96ff620648d5dd098a08c89e027be'
-          deadline=time.monotonic()+6600
-          while True:
-              jobs=get('/actions/runs/44578522410/jobs?per_page=100')['jobs']
-              relevant=[j for j in jobs if j['name']=='certify']
-              assert not any(j['conclusion'] in ['failure','timed_out','cancelled'] for j in relevant),[(j['name'],j['conclusion']) for j in relevant]
-              certified=any(j['conclusion']=='success' for j in relevant)
-              print('All 16 kernel database shards passed; recovered complete database proof and representative collision checks passed:',certified,flush=True)
-              if certified:break
-              assert time.monotonic()<deadline,'Timed out waiting for recovered certification'
-              state=get('/actions/runs/44578522410')
-              assert state['status']!='completed',('Recovery workflow stopped before certification',state['conclusion'])
-              time.sleep(20)
+          jobs=get('/actions/runs/44578522410/jobs?per_page=100')['jobs']
+          certification=[j for j in jobs if j['name']=='certify']
+          assert len(certification)==1
+          steps=certification[0]['steps']
+          assert any(step['name']=='Close and preserve the complete database validity theorem' and step['conclusion']=='success' for step in steps)
           for run_id,name in [(44566749794,'full-kernel-base'),(44578522410,'full-kernel-certified')]:
               artifacts=get(f'/actions/runs/{run_id}/artifacts?per_page=100')['artifacts']
               assert any(a['name']==name and not a['expired'] for a in artifacts),name
-          print('Exact original inputs, all database proofs, and representative collision checks passed. Proceed to all 28314 collisions.')
+          print('Exact original inputs and complete kernel database proofs retained. The new split collision method must pass the representative checks before the full matrix runs.')
           PY
-  cases:
+  smoke:
     needs: prerequisites
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    outputs:
+      workers: ${{ steps.check.outputs.workers }}
+    steps:
+      - uses: actions/checkout@v4
+        with: {persist-credentials: false}
+      - run: |
+          unzip -q rule54_lean_formalization.zip
+          unzip -qo kernel-full-conversion.zip -d rule54_lean_formalization
+          cp kernel_split_cases.py rule54_lean_formalization/
+      - uses: actions/download-artifact@v4
+        with:
+          name: full-kernel-base
+          path: rule54_lean_formalization
+          run-id: 44566749794
+          github-token: ${{ github.token }}
+      - uses: actions/download-artifact@v4
+        with:
+          name: full-kernel-certified
+          path: rule54_lean_formalization
+          run-id: 44578522410
+          github-token: ${{ github.token }}
+      - name: Install pinned Lean and restore checked modules
+        run: |
+          set -euo pipefail
+          curl -fL --retry 3 https://github.com/leanprover/lean4/releases/download/v4.23.0/lean-4.23.0-linux.tar.zst | tar --zstd -xf -
+          echo "$GITHUB_WORKSPACE/lean-4.23.0-linux/bin" >> "$GITHUB_PATH"
+          for f in rule54_lean_formalization/*.tar.zst; do tar --zstd -xf "$f" -C rule54_lean_formalization; done
+      - id: check
+        name: Kernel-check split representative collisions and measure memory
+        working-directory: rule54_lean_formalization
+        run: |
+          set -euo pipefail
+          python3 -u - <<'PY' 2>&1 | tee split-representatives.log
+          import os,resource,time
+          import kernel_full as full
+          import kernel_split_cases as split
+          split.install()
+          full.certify()
+          for index in [0,11228,28313]:
+              start=time.monotonic()
+              full.cases(0,1,[index])
+              print('SPLIT REPRESENTATIVE PASSED',index,'seconds',round(time.monotonic()-start,2),'maximum child RSS KiB',resource.getrusage(resource.RUSAGE_CHILDREN).ru_maxrss,flush=True)
+          peak=resource.getrusage(resource.RUSAGE_CHILDREN).ru_maxrss
+          workers=1 if peak>6*1024*1024 else 2
+          with open(os.environ['GITHUB_OUTPUT'],'a') as output:output.write(f'workers={workers}\n')
+          print('Measured peak memory KiB:',peak,'; independent Lean workers per runner:',workers,flush=True)
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: split-representative-evidence
+          path: |
+            rule54_lean_formalization/split-representatives.log
+            rule54_lean_formalization/kernel-logs
+          retention-days: 7
+  cases:
+    needs: smoke
     runs-on: ubuntu-24.04
     timeout-minutes: 355
     strategy:
@@ -69,7 +121,7 @@ jobs:
       - run: |
           unzip -q rule54_lean_formalization.zip
           unzip -qo kernel-full-conversion.zip -d rule54_lean_formalization
-          cp kernel_parallel_cases.py rule54_lean_formalization/
+          cp kernel_split_cases.py rule54_lean_formalization/
       - uses: actions/download-artifact@v4
         with:
           name: full-kernel-base
@@ -91,7 +143,7 @@ jobs:
       - name: Kernel-check every assigned collision obligation
         working-directory: rule54_lean_formalization
         run: |
-          python3 kernel_parallel_cases.py --shard '${{ matrix.shard }}' --shards 256 --workers 2
+          python3 kernel_split_cases.py cases --shard '${{ matrix.shard }}' --shards 256 --workers '${{ needs.smoke.outputs.workers }}'
           python3 kernel_full.py pack --kind cases --shard '${{ matrix.shard }}' --shards 256
       - uses: actions/upload-artifact@v4
         with:
@@ -114,6 +166,7 @@ jobs:
       - run: |
           unzip -q rule54_lean_formalization.zip
           unzip -qo kernel-full-conversion.zip -d rule54_lean_formalization
+          cp kernel_split_cases.py rule54_lean_formalization/
       - uses: actions/download-artifact@v4
         with:
           name: full-kernel-base
@@ -138,10 +191,10 @@ jobs:
         working-directory: rule54_lean_formalization
         run: |
           set -euo pipefail
-          python3 kernel_full.py assemble 2>&1 | tee full-kernel-verification.log
+          python3 kernel_split_cases.py assemble 2>&1 | tee full-kernel-verification.log
           cp ../kernel_final_audit.py .
           python3 kernel_final_audit.py 2>&1 | tee -a full-kernel-verification.log
-          python3 kernel_full.py export-source
+          python3 kernel_split_cases.py export-source
       - uses: actions/upload-artifact@v4
         if: always()
         with:
