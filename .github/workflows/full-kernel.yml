@@ -6,6 +6,9 @@ on:
   workflow_dispatch:
 permissions:
   contents: read
+concurrency:
+  group: rule54-full-kernel
+  cancel-in-progress: true
 jobs:
   base:
     runs-on: ubuntu-24.04
@@ -181,6 +184,7 @@ jobs:
         run: |
           set -euo pipefail
           python3 kernel_full.py assemble 2>&1 | tee full-kernel-verification.log
+          python3 kernel_full.py export-source
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -191,4 +195,5 @@ jobs:
             rule54_lean_formalization/kernel-logs
             rule54_lean_formalization/Rule54Native.lean
             rule54_lean_formalization/KernelAllCollisions.lean
+            rule54-kernel-verified-source.zip
           retention-days: 3
