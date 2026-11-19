@@ -1,4 +1,3 @@
-er
 name: Full kernel-only Rule 54 verification
 on:
   push:
