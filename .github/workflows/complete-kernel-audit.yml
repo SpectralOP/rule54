@@ -1,0 +1,171 @@
+name: Complete native-free Rule54 audit
+on:
+  push:
+    branches: [kernel-verification]
+    paths: [.github/workflows/complete-kernel-audit.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  prerequisites:
+    runs-on: ubuntu-24.04
+    outputs:
+      workers: ${{ steps.evidence.outputs.workers }}
+    steps:
+      - uses: actions/checkout@v4
+        with: {persist-credentials: false}
+      - name: Verify immutable inputs and passed lookup/collision audits
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python3 - <<'PY'
+          import hashlib,json,os,urllib.request
+          from pathlib import Path
+          base='https://api.github.com/repos/SpectralOP/rule54'
+          def get(path):return json.load(urllib.request.urlopen(urllib.request.Request(base+path,headers={'Authorization':'Bearer '+os.environ['GH_TOKEN'],'User-Agent':'Rule54-audit'})))
+          for name,expected in [('rule54_lean_formalization.zip','fd9f9788f83e44eed7aeaeeb96def5b605c2b98e2eba6e641b4618cd1fea3ef4'),('kernel-full-conversion.zip','b47d0af50ceeac2c69ece6efba9f844520ee6efa69bda2a6c1d11b42fefa35e1')]:
+              assert hashlib.sha256(Path(name).read_bytes()).hexdigest()==expected,name
+          for run_id,sha in [(44585809305,'ee82995019998d4178189a0612b7b59a298516ca'),(44588169175,'044ab25a76a125c4767c8ef00b9fd01c56020176')]:
+              run=get(f'/actions/runs/{run_id}')
+              assert run['head_sha']==sha and run['conclusion']=='success',(run_id,run['conclusion'])
+          print('Original source and certificates, complete lookup equality proof, and representative collision audits verified.')
+          PY
+      - uses: actions/download-artifact@v4
+        with:
+          name: fast-representative-evidence
+          run-id: 44588169175
+          github-token: ${{ github.token }}
+          path: prior-evidence
+      - id: evidence
+        name: Check actual representative axiom and memory reports
+        run: |
+          python3 - <<'PY'
+          import json,os
+          from pathlib import Path
+          report=json.loads(Path('prior-evidence/fast-representatives.json').read_text())
+          assert report['lookup_proof_run_id']==44585809305
+          assert [r['index'] for r in report['results']]==[0,11228,28313]
+          for result in report['results']:assert set(result['axioms'])<={'propext','Classical.choice','Quot.sound'},result
+          assert report['workers'] in [1,2]
+          with open(os.environ['GITHUB_OUTPUT'],'a') as output:output.write('workers='+str(report['workers'])+'\n')
+          print('Measured safe Lean processes per runner:',report['workers'])
+          PY
+  cases:
+    needs: prerequisites
+    runs-on: ubuntu-24.04
+    timeout-minutes: 355
+    strategy:
+      fail-fast: true
+      max-parallel: 16
+      matrix:
+        shard: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 127, 128, 129, 130, 131, 132, 133, 134, 135, 136, 137, 138, 139, 140, 141, 142, 143, 144, 145, 146, 147, 148, 149, 150, 151, 152, 153, 154, 155, 156, 157, 158, 159, 160, 161, 162, 163, 164, 165, 166, 167, 168, 169, 170, 171, 172, 173, 174, 175, 176, 177, 178, 179, 180, 181, 182, 183, 184, 185, 186, 187, 188, 189, 190, 191, 192, 193, 194, 195, 196, 197, 198, 199, 200, 201, 202, 203, 204, 205, 206, 207, 208, 209, 210, 211, 212, 213, 214, 215, 216, 217, 218, 219, 220, 221, 222, 223, 224, 225, 226, 227, 228, 229, 230, 231, 232, 233, 234, 235, 236, 237, 238, 239, 240, 241, 242, 243, 244, 245, 246, 247, 248, 249, 250, 251, 252, 253, 254, 255]
+    steps:
+      - uses: actions/checkout@v4
+        with: {persist-credentials: false}
+      - run: |
+          unzip -q rule54_lean_formalization.zip
+          unzip -qo kernel-full-conversion.zip -d rule54_lean_formalization
+          cp kernel_fast_db.py kernel_split_cases.py kernel_fast_cases.py rule54_lean_formalization/
+      - uses: actions/download-artifact@v4
+        with:
+          name: full-kernel-base
+          run-id: 44566749794
+          github-token: ${{ github.token }}
+          path: rule54_lean_formalization
+      - uses: actions/download-artifact@v4
+        with:
+          name: full-kernel-certified
+          run-id: 44578522410
+          github-token: ${{ github.token }}
+          path: rule54_lean_formalization
+      - uses: actions/download-artifact@v4
+        with:
+          name: kernel-fast-db
+          run-id: 44585809305
+          github-token: ${{ github.token }}
+          path: rule54_lean_formalization
+      - name: Install pinned Lean and restore checked modules
+        run: |
+          set -euo pipefail
+          curl -fL --retry 3 https://github.com/leanprover/lean4/releases/download/v4.23.0/lean-4.23.0-linux.tar.zst | tar --zstd -xf -
+          echo "$GITHUB_WORKSPACE/lean-4.23.0-linux/bin" >> "$GITHUB_PATH"
+          for f in rule54_lean_formalization/*.tar.zst; do tar --zstd -xf "$f" -C rule54_lean_formalization; done
+      - name: Kernel-check assigned collisions and preserve their actual sources
+        working-directory: rule54_lean_formalization
+        run: |
+          python3 kernel_fast_cases.py cases --shard '${{ matrix.shard }}' --shards 256 --workers '${{ needs.prerequisites.outputs.workers }}'
+          python3 kernel_fast_cases.py pack --shard '${{ matrix.shard }}' --shards 256
+      - uses: actions/upload-artifact@v4
+        with:
+          name: full-kernel-cases-${{ matrix.shard }}
+          path: rule54_lean_formalization/kernel-cases-*.tar.zst
+          retention-days: 7
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: case-failure-evidence-${{ matrix.shard }}
+          path: |
+            rule54_lean_formalization/kernel-logs
+            rule54_lean_formalization/kernel-cases-*.tar.zst
+            rule54_lean_formalization/KernelCases
+            rule54_lean_formalization/.verify/KernelCases
+          retention-days: 7
+  final-audit:
+    needs: cases
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+        with: {persist-credentials: false}
+      - run: |
+          unzip -q rule54_lean_formalization.zip
+          unzip -qo kernel-full-conversion.zip -d rule54_lean_formalization
+          cp kernel_fast_db.py kernel_split_cases.py kernel_fast_cases.py kernel_final_audit.py rule54_lean_formalization/
+      - uses: actions/download-artifact@v4
+        with:
+          name: full-kernel-base
+          run-id: 44566749794
+          github-token: ${{ github.token }}
+          path: rule54_lean_formalization
+      - uses: actions/download-artifact@v4
+        with:
+          name: full-kernel-certified
+          run-id: 44578522410
+          github-token: ${{ github.token }}
+          path: rule54_lean_formalization
+      - uses: actions/download-artifact@v4
+        with:
+          name: kernel-fast-db
+          run-id: 44585809305
+          github-token: ${{ github.token }}
+          path: rule54_lean_formalization
+      - uses: actions/download-artifact@v4
+        with: {pattern: 'full-kernel-cases-*', merge-multiple: true, path: rule54_lean_formalization}
+      - name: Install pinned Lean and restore every checked module and source
+        run: |
+          set -euo pipefail
+          curl -fL --retry 3 https://github.com/leanprover/lean4/releases/download/v4.23.0/lean-4.23.0-linux.tar.zst | tar --zstd -xf -
+          echo "$GITHUB_WORKSPACE/lean-4.23.0-linux/bin" >> "$GITHUB_PATH"
+          for f in rule54_lean_formalization/*.tar.zst; do tar --zstd -xf "$f" -C rule54_lean_formalization; done
+      - name: Close the entire manifest and audit every final theorem
+        working-directory: rule54_lean_formalization
+        run: |
+          set -euo pipefail
+          python3 kernel_fast_cases.py assemble 2>&1 | tee full-kernel-verification.log
+          python3 kernel_final_audit.py 2>&1 | tee -a full-kernel-verification.log
+          python3 kernel_fast_cases.py export-source
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: full-kernel-final-audit
+          path: |
+            rule54_lean_formalization/KERNEL-VERIFICATION.txt
+            rule54_lean_formalization/KERNEL-AUDIT-REPORT.json
+            rule54_lean_formalization/KernelAuditExtras.lean
+            rule54_lean_formalization/full-kernel-verification.log
+            rule54_lean_formalization/kernel-logs
+            rule54_lean_formalization/Rule54Native.lean
+            rule54_lean_formalization/KernelAllCollisions.lean
+            rule54-kernel-verified-source.zip
+          retention-days: 7
