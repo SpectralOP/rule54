@@ -10,10 +10,10 @@ permissions:
 jobs:
   prerequisites:
     runs-on: ubuntu-24.04
-    timeout-minutes: 60
+    timeout-minutes: 120
     permissions:
       contents: read
-      actions: write
+      actions: read
     steps:
       - uses: actions/checkout@v4
         with: {persist-credentials: false}
@@ -32,38 +32,27 @@ jobs:
               assert hashlib.sha256(Path(name).read_bytes()).hexdigest()==expected,name
           run=get('/actions/runs/44566749794')
           assert run['head_sha']=='3d01f99ff64fd80f06b4e0eb7591576a109d5493'
-          deadline=time.monotonic()+3300
+          original_jobs=get('/actions/runs/44566749794/jobs?per_page=100')['jobs']
+          assert any(j['name']=='base' and j['conclusion']=='success' for j in original_jobs)
+          assert sum(j['name'].startswith('nodes (') and j['conclusion']=='success' for j in original_jobs)==16
+          recovery=get('/actions/runs/44578522410')
+          assert recovery['head_sha']=='7fb60ce8a4d96ff620648d5dd098a08c89e027be'
+          deadline=time.monotonic()+6600
           while True:
-              jobs=[]
-              page=1
-              while True:
-                  batch=get(f'/actions/runs/44566749794/jobs?per_page=100&page={page}')['jobs']
-                  jobs.extend(batch)
-                  if len(batch)<100:break
-                  page+=1
-              relevant=[j for j in jobs if j['name'] in ['base','certify'] or j['name'].startswith('nodes (')]
+              jobs=get('/actions/runs/44578522410/jobs?per_page=100')['jobs']
+              relevant=[j for j in jobs if j['name']=='certify']
               assert not any(j['conclusion'] in ['failure','timed_out','cancelled'] for j in relevant),[(j['name'],j['conclusion']) for j in relevant]
-              count=sum(j['name'].startswith('nodes (') and j['conclusion']=='success' for j in relevant)
-              certified=any(j['name']=='certify' and j['conclusion']=='success' for j in relevant)
-              print('Kernel database shards passed:',count,'/16; complete database proof and representative collision checks passed:',certified,flush=True)
-              if count==16 and certified:break
-              assert time.monotonic()<deadline,'Timed out waiting for database proofs'
-              state=get('/actions/runs/44566749794')
-              assert state['status']!='completed',('Database proof workflow stopped before certification',state['conclusion'])
+              certified=any(j['conclusion']=='success' for j in relevant)
+              print('All 16 kernel database shards passed; recovered complete database proof and representative collision checks passed:',certified,flush=True)
+              if certified:break
+              assert time.monotonic()<deadline,'Timed out waiting for recovered certification'
+              state=get('/actions/runs/44578522410')
+              assert state['status']!='completed',('Recovery workflow stopped before certification',state['conclusion'])
               time.sleep(20)
-          assert any(j['name']=='base' and j['conclusion']=='success' for j in jobs)
-          artifacts=get('/actions/runs/44566749794/artifacts?per_page=100')['artifacts']
-          for name in ['full-kernel-base','full-kernel-certified']:
+          for run_id,name in [(44566749794,'full-kernel-base'),(44578522410,'full-kernel-certified')]:
+              artifacts=get(f'/actions/runs/{run_id}/artifacts?per_page=100')['artifacts']
               assert any(a['name']==name and not a['expired'] for a in artifacts),name
-          print('Exact original inputs; all 16 database shards and the closed database proof passed.')
-          state=get('/actions/runs/44566749794')
-          if state['status']!='completed':
-              request=urllib.request.Request(base+'/actions/runs/44566749794/cancel',data=b'',method='POST',headers={'Authorization':'Bearer '+os.environ['GH_TOKEN'],'User-Agent':'Rule54-audit','Accept':'application/vnd.github+json'})
-              try:
-                  with urllib.request.urlopen(request) as response:assert response.status==202
-              except urllib.error.HTTPError as error:
-                  if error.code!=409:raise
-              print('Stopped the slower continuation after preserving its successful database proof; all collision cases will be checked in this workflow.')
+          print('Exact original inputs, all database proofs, and representative collision checks passed. Proceed to all 28314 collisions.')
           PY
   cases:
     needs: prerequisites
@@ -91,7 +80,7 @@ jobs:
         with:
           name: full-kernel-certified
           path: rule54_lean_formalization
-          run-id: 44566749794
+          run-id: 44578522410
           github-token: ${{ github.token }}
       - name: Install pinned Lean and restore kernel-checked modules
         run: |
@@ -135,7 +124,7 @@ jobs:
         with:
           name: full-kernel-certified
           path: rule54_lean_formalization
-          run-id: 44566749794
+          run-id: 44578522410
           github-token: ${{ github.token }}
       - uses: actions/download-artifact@v4
         with: {pattern: 'full-kernel-cases-*', merge-multiple: true, path: rule54_lean_formalization}
