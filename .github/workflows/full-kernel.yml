@@ -1,0 +1,195 @@
+er
+name: Full kernel-only Rule 54 verification
+on:
+  push:
+    branches: [kernel-verification]
+    paths: [.github/workflows/full-kernel.yml, kernel-full-conversion.zip]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  base:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        with: {persist-credentials: false}
+      - name: Extract sources
+        run: |
+          unzip -q rule54_lean_formalization.zip
+          unzip -qo kernel-full-conversion.zip -d rule54_lean_formalization
+      - name: Install pinned Lean
+        run: |
+          set -euo pipefail
+          curl -fL --retry 3 https://github.com/leanprover/lean4/releases/download/v4.23.0/lean-4.23.0-linux.tar.zst | tar --zstd -xf -
+          echo "$GITHUB_WORKSPACE/lean-4.23.0-linux/bin" >> "$GITHUB_PATH"
+      - name: Generate and compile the complete shared database
+        working-directory: rule54_lean_formalization
+        run: |
+          python3 kernel_full.py prepare
+          python3 kernel_full.py base
+          python3 kernel_full.py pack --kind base
+      - uses: actions/upload-artifact@v4
+        with:
+          name: full-kernel-base
+          path: rule54_lean_formalization/kernel-base.tar.zst
+          retention-days: 3
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: full-kernel-base-errors
+          path: rule54_lean_formalization/kernel-logs
+          retention-days: 3
+  nodes:
+    needs: base
+    runs-on: ubuntu-24.04
+    timeout-minutes: 180
+    strategy:
+      fail-fast: true
+      max-parallel: 16
+      matrix:
+        shard: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
+    steps:
+      - uses: actions/checkout@v4
+        with: {persist-credentials: false}
+      - run: |
+          unzip -q rule54_lean_formalization.zip
+          unzip -qo kernel-full-conversion.zip -d rule54_lean_formalization
+      - uses: actions/download-artifact@v4
+        with: {name: full-kernel-base, path: rule54_lean_formalization}
+      - name: Install pinned Lean and restore checked modules
+        run: |
+          set -euo pipefail
+          curl -fL --retry 3 https://github.com/leanprover/lean4/releases/download/v4.23.0/lean-4.23.0-linux.tar.zst | tar --zstd -xf -
+          echo "$GITHUB_WORKSPACE/lean-4.23.0-linux/bin" >> "$GITHUB_PATH"
+          tar --zstd -xf rule54_lean_formalization/kernel-base.tar.zst -C rule54_lean_formalization
+      - name: Kernel-check assigned database blocks
+        working-directory: rule54_lean_formalization
+        run: |
+          python3 kernel_full.py nodes --shard '${{ matrix.shard }}' --shards 16
+          python3 kernel_full.py pack --kind nodes --shard '${{ matrix.shard }}' --shards 16
+      - uses: actions/upload-artifact@v4
+        with:
+          name: full-kernel-nodes-${{ matrix.shard }}
+          path: rule54_lean_formalization/kernel-nodes-*.tar.zst
+          retention-days: 3
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: full-kernel-node-errors-${{ matrix.shard }}
+          path: rule54_lean_formalization/kernel-logs
+          retention-days: 3
+  certify:
+    needs: nodes
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    outputs:
+      shards: ${{ steps.matrix.outputs.shards }}
+    steps:
+      - uses: actions/checkout@v4
+        with: {persist-credentials: false}
+      - run: |
+          unzip -q rule54_lean_formalization.zip
+          unzip -qo kernel-full-conversion.zip -d rule54_lean_formalization
+      - uses: actions/download-artifact@v4
+        with: {pattern: 'full-kernel-*', merge-multiple: true, path: rule54_lean_formalization}
+      - name: Install pinned Lean and checked modules
+        run: |
+          set -euo pipefail
+          curl -fL --retry 3 https://github.com/leanprover/lean4/releases/download/v4.23.0/lean-4.23.0-linux.tar.zst | tar --zstd -xf -
+          echo "$GITHUB_WORKSPACE/lean-4.23.0-linux/bin" >> "$GITHUB_PATH"
+          for f in rule54_lean_formalization/*.tar.zst; do tar --zstd -xf "$f" -C rule54_lean_formalization; done
+      - name: Close database validity and test representative full-database cases
+        working-directory: rule54_lean_formalization
+        run: |
+          python3 kernel_full.py certify
+          python3 kernel_full.py cases --indices 0,11228,28313
+          python3 kernel_full.py pack --kind certified
+      - uses: actions/upload-artifact@v4
+        with:
+          name: full-kernel-certified
+          path: rule54_lean_formalization/kernel-certified.tar.zst
+          retention-days: 3
+      - id: matrix
+        run: echo "shards=$(python3 -c 'import json; print(json.dumps(list(range(256))))')" >> "$GITHUB_OUTPUT"
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: full-kernel-certification-errors
+          path: rule54_lean_formalization/kernel-logs
+          retention-days: 3
+  cases:
+    needs: certify
+    runs-on: ubuntu-24.04
+    timeout-minutes: 355
+    strategy:
+      fail-fast: true
+      max-parallel: 20
+      matrix:
+        shard: ${{ fromJSON(needs.certify.outputs.shards) }}
+    steps:
+      - uses: actions/checkout@v4
+        with: {persist-credentials: false}
+      - run: |
+          unzip -q rule54_lean_formalization.zip
+          unzip -qo kernel-full-conversion.zip -d rule54_lean_formalization
+      - uses: actions/download-artifact@v4
+        with: {name: full-kernel-base, path: rule54_lean_formalization}
+      - uses: actions/download-artifact@v4
+        with: {name: full-kernel-certified, path: rule54_lean_formalization}
+      - name: Install pinned Lean and checked modules
+        run: |
+          set -euo pipefail
+          curl -fL --retry 3 https://github.com/leanprover/lean4/releases/download/v4.23.0/lean-4.23.0-linux.tar.zst | tar --zstd -xf -
+          echo "$GITHUB_WORKSPACE/lean-4.23.0-linux/bin" >> "$GITHUB_PATH"
+          for f in rule54_lean_formalization/*.tar.zst; do tar --zstd -xf "$f" -C rule54_lean_formalization; done
+      - name: Kernel-check assigned collision cases
+        working-directory: rule54_lean_formalization
+        run: |
+          python3 kernel_full.py cases --shard '${{ matrix.shard }}' --shards 256
+          python3 kernel_full.py pack --kind cases --shard '${{ matrix.shard }}' --shards 256
+      - uses: actions/upload-artifact@v4
+        with:
+          name: full-kernel-cases-${{ matrix.shard }}
+          path: rule54_lean_formalization/kernel-cases-*.tar.zst
+          retention-days: 3
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: full-kernel-case-errors-${{ matrix.shard }}
+          path: rule54_lean_formalization/kernel-logs
+          retention-days: 3
+  final-audit:
+    needs: cases
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        with: {persist-credentials: false}
+      - run: |
+          unzip -q rule54_lean_formalization.zip
+          unzip -qo kernel-full-conversion.zip -d rule54_lean_formalization
+      - uses: actions/download-artifact@v4
+        with: {pattern: 'full-kernel-*', merge-multiple: true, path: rule54_lean_formalization}
+      - name: Install pinned Lean and restore all checked modules
+        run: |
+          set -euo pipefail
+          curl -fL --retry 3 https://github.com/leanprover/lean4/releases/download/v4.23.0/lean-4.23.0-linux.tar.zst | tar --zstd -xf -
+          echo "$GITHUB_WORKSPACE/lean-4.23.0-linux/bin" >> "$GITHUB_PATH"
+          for f in rule54_lean_formalization/*.tar.zst; do tar --zstd -xf "$f" -C rule54_lean_formalization; done
+      - name: Close every manifest obligation and audit the unchanged final theorem
+        working-directory: rule54_lean_formalization
+        run: |
+          set -euo pipefail
+          python3 kernel_full.py assemble 2>&1 | tee full-kernel-verification.log
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: full-kernel-final-audit
+          path: |
+            rule54_lean_formalization/KERNEL-VERIFICATION.txt
+            rule54_lean_formalization/full-kernel-verification.log
+            rule54_lean_formalization/kernel-logs
+            rule54_lean_formalization/Rule54Native.lean
+            rule54_lean_formalization/KernelAllCollisions.lean
+          retention-days: 3
