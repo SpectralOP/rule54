@@ -1,0 +1,192 @@
+Rule54Lean.HashLife
+Rule54Lean.Native
+Rule54Lean.Splicing
+Rule54Lean.Tag
+Rule54Lean.SourceMachine
+Rule54Lean.Kleene
+Rule54Lean.NW
+Rule54Lean.Clockwise
+Rule54Lean.SourceAlphabet
+Rule54Lean.U15Scans
+Rule54Lean.Block
+Rule54Lean.U15Index
+Rule54Lean.Collisions
+Rule54Lean.Manifest
+Rule54Lean.Coordinates
+Rule54Lean.CollisionFixture
+Rule54Lean.HashSupport
+Rule54Lean.Arena
+Rule54Lean.CollisionFlight
+Rule54Lean.CollisionHead18
+Rule54Lean.CollisionHead2
+Rule54Lean.CollisionBase
+Rule54Lean.Layout
+Rule54Lean.Rest
+Rule54Lean.RuleID
+Rule54Lean.Signals
+Rule54Lean.Reduction
+Rule54Lean.SparseWindow
+Rule54Lean.Bulk
+Rule54Lean.BulkCases
+Rule54Lean.Trajectory
+Rule54Lean.Track
+Rule54Lean.Grid
+Rule54Lean.GridMotion
+Rule54Lean.Coast
+Rule54Lean.U15Print
+Rule54Lean.U15Interpreter
+Rule54Lean.U15Layout
+Rule54Lean.U15BiTag
+Rule54Lean.U15Universal
+Rule54Lean.U15Read
+Rule54Lean.CollisionReceiver
+Rule54Lean.Weighted
+Rule54Lean.SourceQueue
+Rule54Lean.Compiler
+Rule54Lean.Stations
+Rule54Lean.Readout
+Rule54Lean.Encounters
+Rule54Lean.Observer
+Rule54Lean.StationBounds
+Rule54Lean.ClaimChecks
+Rule54Lean.EncounterChecks
+Rule54Lean.InitialClock
+Rule54Lean.Itinerary
+Rule54Lean.PitchedBank
+Rule54Lean.BankCursor
+Rule54Lean.StartOverlay
+Rule54Lean.GridStart
+Rule54Lean.Ports
+Rule54Lean.FirstRead
+Rule54Lean.WriterGrid
+Rule54Lean.Checkpoint
+Rule54Lean.CheckpointRead
+Rule54Lean.CheckpointStart
+Rule54Lean.CheckpointSimulation
+Rule54Lean.CursorRead
+Rule54Lean.CursorBounds
+Rule54Lean.WriterPorts
+Rule54Lean.PortFlights
+Rule54Lean.Store
+Rule54Lean.PortCoast
+Rule54Lean.OffsetFacts
+Rule54Lean.TransportPorts
+Rule54Lean.Clearance
+Rule54Lean.PhysicalPorts
+Rule54Lean.Route
+Rule54Lean.TransportFlights
+Rule54Lean.TraceFlights
+Rule54Lean.UniversalCheckpoint
+Rule54Lean.CommonTails
+Rule54Lean.SignedRoute
+Rule54Lean.RouteClock
+Rule54Lean.PhysicalSweep
+Rule54Lean.SamplingClock
+Rule54Lean.EffectiveSampling
+Rule54Lean.OnlineCheckpoint
+Rule54Lean.HonestHalts
+Rule54Lean.ObservedMachine
+Rule54Lean.ObservedHalts
+Rule54Lean.OrdinarySampler
+Rule54Lean.InfiniteOrbit
+Rule54Lean
+Checked 92 modules
+✔ [2/33] Built Rule54Lean.HashLife (949ms)
+✔ [3/33] Built Rule54Lean.HashLife:c.o (176ms)
+✔ [4/33] Built Rule54Lean.Block (11s)
+✔ [5/33] Built Rule54Lean.Block:c.o (152ms)
+✔ [6/33] Built Rule54Lean.Manifest (655ms)
+✔ [7/33] Built Rule54Lean.Collisions (808ms)
+✔ [8/33] Built Rule54Lean.Coordinates (1.0s)
+✔ [9/33] Built Rule54Lean.Collisions:c.o (218ms)
+✔ [10/33] Built Rule54Lean.Coordinates:c.o (103ms)
+✔ [11/33] Built Rule54Lean.Manifest:c.o (374ms)
+✔ [12/33] Built Rule54Lean.HashSupport (823ms)
+✔ [13/33] Built Rule54Lean.HashSupport:c.o (86ms)
+✔ [14/33] Built Rule54Lean.CollisionFixture (865ms)
+✔ [15/33] Built Rule54Lean.Rest (1.1s)
+✔ [16/33] Built Rule54Lean.Signals (848ms)
+✔ [17/33] Built Rule54Lean.CollisionFixture:c.o (231ms)
+✔ [18/33] Built Rule54Lean.Rest:c.o (112ms)
+✔ [19/33] Built Rule54Lean.Signals:c.o (80ms)
+✔ [20/33] Built Rule54Lean.Arena (728ms)
+✔ [21/33] Built Rule54Lean.Arena:c.o (191ms)
+✔ [22/33] Built Rule54Lean.SparseWindow (1.2s)
+✔ [23/33] Built Rule54Lean.SparseWindow:c.o (154ms)
+✔ [24/33] Built Rule54Lean.Bulk (471ms)
+✔ [25/33] Built Rule54Lean.Reduction (1.5s)
+✔ [26/33] Built Rule54Lean.Reduction:c.o (52ms)
+✔ [27/33] Built Rule54Lean.Bulk:c.o (246ms)
+⚠ [28/33] Built Rule54Lean.CollisionBase (90s)
+warning: Rule54Lean/CollisionBase.lean:38:78: exponent 261 exceeds the threshold 256, exponentiation operation was not evaluated, use `set_option exponentiation.threshold <num>` to set a new threshold
+warning: Rule54Lean/CollisionBase.lean:39:78: exponent 269 exceeds the threshold 256, exponentiation operation was not evaluated, use `set_option exponentiation.threshold <num>` to set a new threshold
+warning: Rule54Lean/CollisionBase.lean:40:78: exponent 277 exceeds the threshold 256, exponentiation operation was not evaluated, use `set_option exponentiation.threshold <num>` to set a new threshold
+warning: Rule54Lean/CollisionBase.lean:41:78: exponent 285 exceeds the threshold 256, exponentiation operation was not evaluated, use `set_option exponentiation.threshold <num>` to set a new threshold
+warning: Rule54Lean/CollisionBase.lean:42:78: exponent 293 exceeds the threshold 256, exponentiation operation was not evaluated, use `set_option exponentiation.threshold <num>` to set a new threshold
+warning: Rule54Lean/CollisionBase.lean:43:78: exponent 301 exceeds the threshold 256, exponentiation operation was not evaluated, use `set_option exponentiation.threshold <num>` to set a new threshold
+warning: Rule54Lean/CollisionBase.lean:44:78: exponent 309 exceeds the threshold 256, exponentiation operation was not evaluated, use `set_option exponentiation.threshold <num>` to set a new threshold
+warning: Rule54Lean/CollisionBase.lean:45:78: exponent 317 exceeds the threshold 256, exponentiation operation was not evaluated, use `set_option exponentiation.threshold <num>` to set a new threshold
+warning: Rule54Lean/CollisionBase.lean:74:78: exponent 261 exceeds the threshold 256, exponentiation operation was not evaluated, use `set_option exponentiation.threshold <num>` to set a new threshold
+warning: Rule54Lean/CollisionBase.lean:75:78: exponent 269 exceeds the threshold 256, exponentiation operation was not evaluated, use `set_option exponentiation.threshold <num>` to set a new threshold
+warning: Rule54Lean/CollisionBase.lean:76:78: exponent 277 exceeds the threshold 256, exponentiation operation was not evaluated, use `set_option exponentiation.threshold <num>` to set a new threshold
+warning: Rule54Lean/CollisionBase.lean:77:78: exponent 285 exceeds the threshold 256, exponentiation operation was not evaluated, use `set_option exponentiation.threshold <num>` to set a new threshold
+warning: Rule54Lean/CollisionBase.lean:78:78: exponent 293 exceeds the threshold 256, exponentiation operation was not evaluated, use `set_option exponentiation.threshold <num>` to set a new threshold
+warning: Rule54Lean/CollisionBase.lean:79:78: exponent 301 exceeds the threshold 256, exponentiation operation was not evaluated, use `set_option exponentiation.threshold <num>` to set a new threshold
+warning: Rule54Lean/CollisionBase.lean:80:78: exponent 309 exceeds the threshold 256, exponentiation operation was not evaluated, use `set_option exponentiation.threshold <num>` to set a new threshold
+warning: Rule54Lean/CollisionBase.lean:81:78: exponent 317 exceeds the threshold 256, exponentiation operation was not evaluated, use `set_option exponentiation.threshold <num>` to set a new threshold
+warning: Rule54Lean/CollisionBase.lean:109:78: exponent 261 exceeds the threshold 256, exponentiation operation was not evaluated, use `set_option exponentiation.threshold <num>` to set a new threshold
+warning: Rule54Lean/CollisionBase.lean:110:78: exponent 269 exceeds the threshold 256, exponentiation operation was not evaluated, use `set_option exponentiation.threshold <num>` to set a new threshold
+warning: Rule54Lean/CollisionBase.lean:111:78: exponent 277 exceeds the threshold 256, exponentiation operation was not evaluated, use `set_option exponentiation.threshold <num>` to set a new threshold
+warning: Rule54Lean/CollisionBase.lean:112:78: exponent 285 exceeds the threshold 256, exponentiation operation was not evaluated, use `set_option exponentiation.threshold <num>` to set a new threshold
+warning: Rule54Lean/CollisionBase.lean:113:78: exponent 293 exceeds the threshold 256, exponentiation operation was not evaluated, use `set_option exponentiation.threshold <num>` to set a new threshold
+warning: Rule54Lean/CollisionBase.lean:114:78: exponent 301 exceeds the threshold 256, exponentiation operation was not evaluated, use `set_option exponentiation.threshold <num>` to set a new threshold
+warning: Rule54Lean/CollisionBase.lean:115:78: exponent 309 exceeds the threshold 256, exponentiation operation was not evaluated, use `set_option exponentiation.threshold <num>` to set a new threshold
+warning: Rule54Lean/CollisionBase.lean:116:78: exponent 317 exceeds the threshold 256, exponentiation operation was not evaluated, use `set_option exponentiation.threshold <num>` to set a new threshold
+✔ [29/33] Built Rule54Lean.CollisionBase:c.o (52ms)
+✔ [30/33] Built Rule54Lean.BulkCases (1.1s)
+✔ [31/33] Built Rule54Lean.BulkCases:c.o (374ms)
+✔ [32/33] Built Rule54Data (1.3s)
+✔ [33/33] Built Rule54Data:c.o (809ms)
+Build completed successfully (33 jobs).
+'Rule54Lean.NativeReplay.all_collisions' depends on axioms: [propext,
+ Classical.choice,
+ Lean.ofReduceBool,
+ Lean.trustCompiler,
+ Quot.sound]
+'Rule54Lean.WeakUniversality.simulation_iff' depends on axioms: [propext,
+ Classical.choice,
+ Lean.ofReduceBool,
+ Lean.trustCompiler,
+ Quot.sound]
+'Rule54Lean.WeakUniversality.halting_observation' depends on axioms: [propext,
+ Classical.choice,
+ Lean.ofReduceBool,
+ Lean.trustCompiler,
+ Quot.sound]
+'Rule54Lean.WeakUniversality.halting_iff' depends on axioms: [propext,
+ Classical.choice,
+ Lean.ofReduceBool,
+ Lean.trustCompiler,
+ Quot.sound]
+'Rule54Lean.WeakUniversality.infinite_run' depends on axioms: [propext,
+ Classical.choice,
+ Lean.ofReduceBool,
+ Lean.trustCompiler,
+ Quot.sound]
+'Rule54Lean.WeakUniversality.simulated_at_clock' depends on axioms: [propext,
+ Classical.choice,
+ Lean.ofReduceBool,
+ Lean.trustCompiler,
+ Quot.sound]
+'Rule54Lean.WeakUniversality.weak_universality' depends on axioms: [propext,
+ Classical.choice,
+ Lean.ofReduceBool,
+ Lean.trustCompiler,
+ Quot.sound]
+'Rule54Lean.WeakUniversality.rule54_simulates' depends on axioms: [propext,
+ Classical.choice,
+ Lean.ofReduceBool,
+ Lean.trustCompiler,
+ Quot.sound]
+'Rule54Lean.UniversalCheckpoint.common_tails' depends on axioms: [propext, Quot.sound]
+Verified Rule54Lean.WeakUniversality.weak_universality
