@@ -9,6 +9,7 @@ version=subprocess.check_output(['lean','--version'],text=True).strip()
 assert '4.23.0' in version,version
 assert sorted(p.name for p in (root/'.verify/KernelCases').glob('C*.olean'))==[f'C{i:05d}.olean' for i in range(28314)]
 assert sorted(p.name for p in (root/'.verify/KernelNodes').glob('Block*.olean'))==[f'Block{i:04d}.olean' for i in range(256)]
+assert sorted(p.name for p in (root/'.verify/KernelFastData').glob('Part*.olean'))==[f'Part{i:04d}.olean' for i in range(318)]
 original=root.parent/'rule54_lean_formalization.zip'
 assert hashlib.sha256(original.read_bytes()).hexdigest()=='fd9f9788f83e44eed7aeaeeb96def5b605c2b98e2eba6e641b4618cd1fea3ef4'
 sources={}
@@ -24,7 +25,8 @@ assert len(sources)==96
 names=['Rule54.number_is_54','Rule54Lean.UniversalCheckpoint.periodic_input',
        'Rule54Lean.UniversalCheckpoint.common_tails',
        'Rule54Lean.UniversalCheckpoint.initialRow','Rule54Lean.UniversalCheckpoint.observe',
-       'Rule54.KernelCertified.db_ok','Rule54Lean.KernelCertificate.all_collisions']
+       'Rule54.KernelCertified.db_ok','Rule54.KernelFastData.db_eq','Rule54.KernelFastData.db_ok',
+       'Rule54Lean.KernelCertificate.all_collisions']
 full.write('KernelAuditExtras.lean','import Rule54WeakUniversality\n'+''.join('#print axioms '+name+'\n' for name in names))
 extras=full.compile_module('KernelAuditExtras')
 audit=(root/'KERNEL-VERIFICATION.txt').read_text(encoding='utf-8')
@@ -42,8 +44,9 @@ report={
     'status':'PASS',
     'lean_version':'4.23.0',
     'actual_lean_version_output':version,
-    'collision_prover':'kernel_split_cases.py',
+    'collision_prover':'kernel_fast_cases.py',
     'certification_artifact_run_id':44578522410,
+    'direct_lookup_proof_run_id':44585809305,
     'collision_proof_count':28314,
     'database_block_proof_count':256,
     'original_lean_sources_retained_byte_for_byte':95,
