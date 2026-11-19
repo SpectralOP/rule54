@@ -1,0 +1,100 @@
+name: Resume kernel database certification
+on:
+  push:
+    branches: [kernel-verification]
+    paths: [.github/workflows/recover-kernel-certification.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  certify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    permissions:
+      contents: read
+      actions: write
+    steps:
+      - uses: actions/checkout@v4
+        with: {persist-credentials: false}
+      - name: Verify retained proofs and stop interrupted attempts
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python3 - <<'PY'
+          import hashlib,json,os,urllib.request,urllib.error
+          from pathlib import Path
+          base='https://api.github.com/repos/SpectralOP/rule54'
+          headers={'Authorization':'Bearer '+os.environ['GH_TOKEN'],'User-Agent':'Rule54-audit','Accept':'application/vnd.github+json'}
+          def get(path):return json.load(urllib.request.urlopen(urllib.request.Request(base+path,headers=headers)))
+          assert hashlib.sha256(Path('kernel-full-conversion.zip').read_bytes()).hexdigest()=='b47d0af50ceeac2c69ece6efba9f844520ee6efa69bda2a6c1d11b42fefa35e1'
+          source=get('/actions/runs/44566749794')
+          assert source['head_sha']=='3d01f99ff64fd80f06b4e0eb7591576a109d5493'
+          jobs=get('/actions/runs/44566749794/jobs?per_page=100')['jobs']
+          assert any(j['name']=='base' and j['conclusion']=='success' for j in jobs)
+          assert sum(j['name'].startswith('nodes (') and j['conclusion']=='success' for j in jobs)==16
+          artifacts=get('/actions/runs/44566749794/artifacts?per_page=100')['artifacts']
+          expected=['full-kernel-base']+[f'full-kernel-nodes-{i}' for i in range(16)]
+          assert all(any(a['name']==name and not a['expired'] for a in artifacts) for name in expected)
+          for run in [44566749794,44573737227]:
+              if get(f'/actions/runs/{run}')['status']=='completed':continue
+              try:
+                  with urllib.request.urlopen(urllib.request.Request(base+f'/actions/runs/{run}/cancel',data=b'',headers=headers,method='POST')) as response:assert response.status==202
+              except urllib.error.HTTPError as error:
+                  if error.code!=409:raise
+          print('Verified all retained database proofs; resume certification without repeating them.')
+          PY
+      - run: |
+          unzip -q rule54_lean_formalization.zip
+          unzip -qo kernel-full-conversion.zip -d rule54_lean_formalization
+      - uses: actions/download-artifact@v4
+        with:
+          name: full-kernel-base
+          run-id: 44566749794
+          github-token: ${{ github.token }}
+          path: rule54_lean_formalization
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: 'full-kernel-nodes-*'
+          merge-multiple: true
+          run-id: 44566749794
+          github-token: ${{ github.token }}
+          path: rule54_lean_formalization
+      - name: Install pinned Lean and restore checked proof modules
+        run: |
+          set -euo pipefail
+          curl -fL --retry 3 https://github.com/leanprover/lean4/releases/download/v4.23.0/lean-4.23.0-linux.tar.zst | tar --zstd -xf -
+          echo "$GITHUB_WORKSPACE/lean-4.23.0-linux/bin" >> "$GITHUB_PATH"
+          for f in rule54_lean_formalization/*.tar.zst; do tar --zstd -xf "$f" -C rule54_lean_formalization; done
+      - name: Close and preserve the complete database validity theorem
+        working-directory: rule54_lean_formalization
+        run: |
+          set -euo pipefail
+          python3 kernel_full.py certify 2>&1 | tee certification-recovery.log
+          python3 kernel_full.py pack --kind certified
+      - uses: actions/upload-artifact@v4
+        with:
+          name: full-kernel-certified
+          path: rule54_lean_formalization/kernel-certified.tar.zst
+          retention-days: 7
+      - name: Check representative collisions with resource diagnostics
+        working-directory: rule54_lean_formalization
+        run: |
+          set -euo pipefail
+          /usr/bin/time -v python3 -u - <<'PY' 2>&1 | tee -a certification-recovery.log
+          import os,resource,time
+          import kernel_full as full
+          print('Available CPUs:',os.cpu_count(),flush=True)
+          for index in [0,11228,28313]:
+              start=time.monotonic()
+              full.cases(0,1,[index])
+              print('REPRESENTATIVE PASSED',index,'seconds',round(time.monotonic()-start,2),'maximum child RSS KiB',resource.getrusage(resource.RUSAGE_CHILDREN).ru_maxrss,flush=True)
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: certification-recovery-evidence
+          path: |
+            rule54_lean_formalization/certification-recovery.log
+            rule54_lean_formalization/kernel-logs
+          retention-days: 7
