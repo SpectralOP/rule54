@@ -1,0 +1,58 @@
+name: Rule54 audit evidence and certificate regeneration
+on:
+  push:
+    branches: [kernel-verification]
+    paths: [.github/workflows/audit-evidence.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  integrity-and-regeneration:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with: {persist-credentials: false}
+      - name: Audit original source integrity and disclosed trust
+        run: |
+          python3 - <<'PY'
+          import hashlib,json,re,zipfile
+          from pathlib import Path
+          p=Path('rule54_lean_formalization.zip')
+          digest=hashlib.sha256(p.read_bytes()).hexdigest()
+          assert digest=='fd9f9788f83e44eed7aeaeeb96def5b605c2b98e2eba6e641b4618cd1fea3ef4'
+          with zipfile.ZipFile(p) as z:
+              sources={n:z.read(n) for n in z.namelist() if n.endswith('.lean')}
+              assert len(sources)==96,len(sources)
+              failures=[]
+              native=[]
+              for name,data in sources.items():
+                  text=data.decode('utf-8')
+                  if re.search(r'^\s*(?:axiom|sorry|admit)\b',text,re.M):failures.append(name)
+                  native.extend([name]*len(re.findall(r'\bnative_decide\b',text)))
+              assert not failures,failures
+              assert native==['rule54_lean_formalization/Rule54Native.lean']*2,native
+              report={'original_archive_sha256':digest,'lean_source_count':len(sources),'disclosed_native_decide_uses':len(native),'source_sha256':{n:hashlib.sha256(v).hexdigest() for n,v in sorted(sources.items())}}
+              Path('source-integrity.json').write_text(json.dumps(report,indent=2)+'\n')
+              print('Original archive SHA256:',digest)
+              print('96 Lean source files; exactly two disclosed native_decide uses; no source declarations of axioms or admitted proofs found.')
+              z.extractall('.')
+          PY
+      - name: Independently regenerate every collision certificate
+        working-directory: rule54_lean_formalization
+        run: |
+          set -euo pipefail
+          python3 tools/make_arena.py regenerated 2>&1 | tee certificate-regeneration.log
+          cmp BulkData/nodes.txt regenerated/nodes.txt
+          cmp BulkData/roots.txt regenerated/roots.txt
+          sha256sum BulkData/nodes.txt BulkData/roots.txt regenerated/nodes.txt regenerated/roots.txt | tee certificate-sha256.txt
+          echo 'Both regenerated certificate files match the original files byte for byte.' | tee -a certificate-regeneration.log
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: rule54-audit-integrity-and-regeneration
+          path: |
+            source-integrity.json
+            rule54_lean_formalization/certificate-regeneration.log
+            rule54_lean_formalization/certificate-sha256.txt
+          retention-days: 7
