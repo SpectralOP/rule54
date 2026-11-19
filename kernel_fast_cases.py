@@ -15,12 +15,13 @@ def install():
     split.install()
     original_write=full.write
     def write(name,text):
+        if name.startswith('KernelCases/') and full.EMIT_ONLY and (full.ROOT/name).is_file():return
         if name=='README-KERNEL.txt':
             for command in ['cases','assemble']:
-                text=text.replace(f'python3 kernel_full.py {command}',f'python3 kernel_fast_cases.py {command}')
-                text=text.replace(f'python3 kernel_split_cases.py {command}',f'python3 kernel_fast_cases.py {command}')
+                text=text.replace(f'python3 kernel_full.py {command}',f'python3 kernel_fast_cases.py {"verify-cases" if command=="cases" else command}')
+                text=text.replace(f'python3 kernel_split_cases.py {command}',f'python3 kernel_fast_cases.py {"verify-cases" if command=="cases" else command}')
             text=text.replace('python3 kernel_full.py certify\n','python3 kernel_full.py certify\npython3 kernel_fast_db.py prepare\npython3 kernel_fast_db.py build\n')
-            text+='\nKernelFastDB proves equality to the complete checked database. The\ndirect lookup functions change reduction cost, not the collision statements.\n'
+            text+='\nThe archive retains the actual collision sources checked by the jobs.\nverify-cases recompiles these sources without regenerating them.\n\nKernelFastDB proves equality to the complete checked database. The\ndirect lookup functions change reduction cost, not the collision statements.\n'
         original_write(name,text)
     full.write=write
     original_compile=full.compile_module
@@ -53,6 +54,8 @@ def pack(shard,shards):
         for i in indices:
             path=full.OUT/f'KernelCases/C{i:05d}.olean';assert path.is_file(),path
             archive.add(path,arcname=path.relative_to(full.ROOT).as_posix())
+            source=full.ROOT/f'KernelCases/C{i:05d}.lean';assert source.is_file(),source
+            archive.add(source,arcname=source.relative_to(full.ROOT).as_posix())
     subprocess.run(['zstd','-T2','-12','--rm','-f',str(dest)],check=True)
     packed=Path(str(dest)+'.zst')
     assert packed.stat().st_size<4*1024**2,('Collision proof artifact too large',packed.stat().st_size)
@@ -60,7 +63,7 @@ def pack(shard,shards):
 
 if __name__=='__main__':
     parser=argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('stage',choices=['cases','pack','assemble','export-source'])
+    parser.add_argument('stage',choices=['cases','verify-cases','pack','assemble','export-source'])
     parser.add_argument('--shard',type=int,default=0)
     parser.add_argument('--shards',type=int,default=1)
     parser.add_argument('--workers',type=int,default=1)
@@ -75,4 +78,6 @@ if __name__=='__main__':
         keys=full.keys();roots=(full.ROOT/'BulkData/roots.txt').read_bytes()
         indices=[int(x) for x in args.indices.split(',')] if args.indices else range(args.shard,len(keys),args.shards)
         with ThreadPoolExecutor(max_workers=args.workers) as pool:
-            list(pool.map(lambda i:split.make_case(i,keys,roots),indices))
+            if args.stage=='verify-cases':
+                list(pool.map(lambda i:full.compile_module(f'KernelCases.C{i:05d}'),indices))
+            else:list(pool.map(lambda i:split.make_case(i,keys,roots),indices))
