@@ -1,0 +1,110 @@
+name: Audit additional collision boundary families
+on:
+  push:
+    branches: [kernel-verification]
+    paths: [.github/workflows/collision-boundaries.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  representatives:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+        with: {persist-credentials: false}
+      - name: Wait for the kernel-proved lookup equivalence
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python3 -u - <<'PY'
+          import hashlib,json,os,time,urllib.request
+          from pathlib import Path
+          base='https://api.github.com/repos/SpectralOP/rule54'
+          def get(path):return json.load(urllib.request.urlopen(urllib.request.Request(base+path,headers={'Authorization':'Bearer '+os.environ['GH_TOKEN'],'User-Agent':'Rule54-audit'})))
+          for name,expected in [('rule54_lean_formalization.zip','fd9f9788f83e44eed7aeaeeb96def5b605c2b98e2eba6e641b4618cd1fea3ef4'),('kernel-full-conversion.zip','b47d0af50ceeac2c69ece6efba9f844520ee6efa69bda2a6c1d11b42fefa35e1')]:
+              assert hashlib.sha256(Path(name).read_bytes()).hexdigest()==expected,name
+          deadline=time.monotonic()+5400
+          while True:
+              run=get('/actions/runs/44585809305')
+              assert run['head_sha']=='ee82995019998d4178189a0612b7b59a298516ca'
+              print('Lookup equality proof workflow:',run['status'],run['conclusion'],flush=True)
+              if run['status']=='completed':assert run['conclusion']=='success';break
+              assert time.monotonic()<deadline
+              time.sleep(20)
+          PY
+      - run: |
+          unzip -q rule54_lean_formalization.zip
+          unzip -qo kernel-full-conversion.zip -d rule54_lean_formalization
+          cp kernel_fast_db.py kernel_split_cases.py kernel_fast_cases.py rule54_lean_formalization/
+      - uses: actions/download-artifact@v4
+        with:
+          name: full-kernel-base
+          run-id: 44566749794
+          github-token: ${{ github.token }}
+          path: rule54_lean_formalization
+      - uses: actions/download-artifact@v4
+        with:
+          name: full-kernel-certified
+          run-id: 44578522410
+          github-token: ${{ github.token }}
+          path: rule54_lean_formalization
+      - uses: actions/download-artifact@v4
+        with:
+          name: kernel-fast-db
+          run-id: 44585809305
+          github-token: ${{ github.token }}
+          path: rule54_lean_formalization
+      - name: Install pinned Lean and restore kernel-checked modules
+        run: |
+          set -euo pipefail
+          curl -fL --retry 3 https://github.com/leanprover/lean4/releases/download/v4.23.0/lean-4.23.0-linux.tar.zst | tar --zstd -xf -
+          echo "$GITHUB_WORKSPACE/lean-4.23.0-linux/bin" >> "$GITHUB_PATH"
+          for f in rule54_lean_formalization/*.tar.zst; do tar --zstd -xf "$f" -C rule54_lean_formalization; done
+      - name: Audit exact collisions and measure reduction resources
+        working-directory: rule54_lean_formalization
+        run: |
+          set -euo pipefail
+          python3 -u - <<'PY' 2>&1 | tee extended-boundaries.log
+          import json,re,resource,time
+          from pathlib import Path
+          import kernel_full as full
+          import kernel_fast_cases as cases
+          cases.install()
+          original_write=full.write
+          def write(name,text):
+              if name.startswith('KernelCases/C'):
+                  index=int(Path(name).stem[1:])
+                  text+='\n#print axioms Rule54Lean.KernelCases.c'+str(index)+'\n'
+              original_write(name,text)
+          full.write=write
+          full.write('FastLookupAudit.lean','import KernelFastDB\n#print axioms Rule54.KernelFastData.db_eq\n#print axioms Rule54.KernelFastData.db_ok\n')
+          full.compile_module('FastLookupAudit')
+          results=[]
+          for index in [11231,11235,11155,11239,28303,28307]:
+              start=time.monotonic()
+              full.cases(0,1,[index])
+              output=(full.LOG/f'KernelCases.C{index:05d}.log').read_text()
+              matches=re.findall(r"'Rule54Lean\.KernelCases\.c"+str(index)+r"' depends on axioms:\s*\[([^\]]*)\]",output,re.S)
+              assert len(matches)==1,(index,output)
+              axioms={a.strip() for a in matches[0].split(',') if a.strip()}
+              assert axioms<={'propext','Classical.choice','Quot.sound'},axioms
+              result={'index':index,'seconds':round(time.monotonic()-start,2),'maximum_child_rss_KiB':resource.getrusage(resource.RUSAGE_CHILDREN).ru_maxrss,'axioms':sorted(axioms)}
+              results.append(result);print('DIRECT LOOKUP COLLISION PASSED',json.dumps(result),flush=True)
+          peak=resource.getrusage(resource.RUSAGE_CHILDREN).ru_maxrss
+          workers=1 if peak>6*1024*1024 else 2
+          report={'scope':'additional boundary families; complete manifest verification still required','lookup_proof_run_id':44585809305,'results':results,'workers':workers}
+          full.write('extended-boundaries.json',json.dumps(report,indent=2)+'\n')
+          print('ALL EXTENDED BOUNDARY CASES PASSED; workers:',workers,flush=True)
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: extended-boundary-evidence
+          path: |
+            rule54_lean_formalization/extended-boundaries.json
+            rule54_lean_formalization/extended-boundaries.log
+            rule54_lean_formalization/FastLookupAudit.lean
+            rule54_lean_formalization/kernel-logs
+          retention-days: 7
