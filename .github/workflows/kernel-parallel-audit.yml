@@ -1,0 +1,169 @@
+name: Complete Rule54 kernel collision audit
+on:
+  push:
+    branches: [kernel-verification]
+    paths: [.github/workflows/kernel-parallel-audit.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  prerequisites:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    permissions:
+      contents: read
+      actions: write
+    steps:
+      - uses: actions/checkout@v4
+        with: {persist-credentials: false}
+      - name: Verify exact source inputs and completed kernel database audit
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python3 - <<'PY'
+          import hashlib,json,os,time,urllib.request,urllib.error
+          from pathlib import Path
+          base='https://api.github.com/repos/SpectralOP/rule54'
+          def get(path):
+              req=urllib.request.Request(base+path,headers={'Authorization':'Bearer '+os.environ['GH_TOKEN'],'User-Agent':'Rule54-audit'})
+              return json.load(urllib.request.urlopen(req))
+          for name,expected in [('rule54_lean_formalization.zip','fd9f9788f83e44eed7aeaeeb96def5b605c2b98e2eba6e641b4618cd1fea3ef4'),('kernel-full-conversion.zip','b47d0af50ceeac2c69ece6efba9f844520ee6efa69bda2a6c1d11b42fefa35e1')]:
+              assert hashlib.sha256(Path(name).read_bytes()).hexdigest()==expected,name
+          run=get('/actions/runs/44566749794')
+          assert run['head_sha']=='3d01f99ff64fd80f06b4e0eb7591576a109d5493'
+          deadline=time.monotonic()+3300
+          while True:
+              jobs=[]
+              page=1
+              while True:
+                  batch=get(f'/actions/runs/44566749794/jobs?per_page=100&page={page}')['jobs']
+                  jobs.extend(batch)
+                  if len(batch)<100:break
+                  page+=1
+              relevant=[j for j in jobs if j['name'] in ['base','certify'] or j['name'].startswith('nodes (')]
+              assert not any(j['conclusion'] in ['failure','timed_out','cancelled'] for j in relevant),[(j['name'],j['conclusion']) for j in relevant]
+              count=sum(j['name'].startswith('nodes (') and j['conclusion']=='success' for j in relevant)
+              certified=any(j['name']=='certify' and j['conclusion']=='success' for j in relevant)
+              print('Kernel database shards passed:',count,'/16; complete database proof and representative collision checks passed:',certified,flush=True)
+              if count==16 and certified:break
+              assert time.monotonic()<deadline,'Timed out waiting for database proofs'
+              state=get('/actions/runs/44566749794')
+              assert state['status']!='completed',('Database proof workflow stopped before certification',state['conclusion'])
+              time.sleep(20)
+          assert any(j['name']=='base' and j['conclusion']=='success' for j in jobs)
+          artifacts=get('/actions/runs/44566749794/artifacts?per_page=100')['artifacts']
+          for name in ['full-kernel-base','full-kernel-certified']:
+              assert any(a['name']==name and not a['expired'] for a in artifacts),name
+          print('Exact original inputs; all 16 database shards and the closed database proof passed.')
+          state=get('/actions/runs/44566749794')
+          if state['status']!='completed':
+              request=urllib.request.Request(base+'/actions/runs/44566749794/cancel',data=b'',method='POST',headers={'Authorization':'Bearer '+os.environ['GH_TOKEN'],'User-Agent':'Rule54-audit','Accept':'application/vnd.github+json'})
+              try:
+                  with urllib.request.urlopen(request) as response:assert response.status==202
+              except urllib.error.HTTPError as error:
+                  if error.code!=409:raise
+              print('Stopped the slower continuation after preserving its successful database proof; all collision cases will be checked in this workflow.')
+          PY
+  cases:
+    needs: prerequisites
+    runs-on: ubuntu-24.04
+    timeout-minutes: 355
+    strategy:
+      fail-fast: true
+      max-parallel: 20
+      matrix:
+        shard: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 127, 128, 129, 130, 131, 132, 133, 134, 135, 136, 137, 138, 139, 140, 141, 142, 143, 144, 145, 146, 147, 148, 149, 150, 151, 152, 153, 154, 155, 156, 157, 158, 159, 160, 161, 162, 163, 164, 165, 166, 167, 168, 169, 170, 171, 172, 173, 174, 175, 176, 177, 178, 179, 180, 181, 182, 183, 184, 185, 186, 187, 188, 189, 190, 191, 192, 193, 194, 195, 196, 197, 198, 199, 200, 201, 202, 203, 204, 205, 206, 207, 208, 209, 210, 211, 212, 213, 214, 215, 216, 217, 218, 219, 220, 221, 222, 223, 224, 225, 226, 227, 228, 229, 230, 231, 232, 233, 234, 235, 236, 237, 238, 239, 240, 241, 242, 243, 244, 245, 246, 247, 248, 249, 250, 251, 252, 253, 254, 255]
+    steps:
+      - uses: actions/checkout@v4
+        with: {persist-credentials: false}
+      - run: |
+          unzip -q rule54_lean_formalization.zip
+          unzip -qo kernel-full-conversion.zip -d rule54_lean_formalization
+          cp kernel_parallel_cases.py rule54_lean_formalization/
+      - uses: actions/download-artifact@v4
+        with:
+          name: full-kernel-base
+          path: rule54_lean_formalization
+          run-id: 44566749794
+          github-token: ${{ github.token }}
+      - uses: actions/download-artifact@v4
+        with:
+          name: full-kernel-certified
+          path: rule54_lean_formalization
+          run-id: 44566749794
+          github-token: ${{ github.token }}
+      - name: Install pinned Lean and restore kernel-checked modules
+        run: |
+          set -euo pipefail
+          curl -fL --retry 3 https://github.com/leanprover/lean4/releases/download/v4.23.0/lean-4.23.0-linux.tar.zst | tar --zstd -xf -
+          echo "$GITHUB_WORKSPACE/lean-4.23.0-linux/bin" >> "$GITHUB_PATH"
+          for f in rule54_lean_formalization/*.tar.zst; do tar --zstd -xf "$f" -C rule54_lean_formalization; done
+      - name: Kernel-check every assigned collision obligation
+        working-directory: rule54_lean_formalization
+        run: |
+          python3 kernel_parallel_cases.py --shard '${{ matrix.shard }}' --shards 256 --workers 2
+          python3 kernel_full.py pack --kind cases --shard '${{ matrix.shard }}' --shards 256
+      - uses: actions/upload-artifact@v4
+        with:
+          name: full-kernel-cases-${{ matrix.shard }}
+          path: rule54_lean_formalization/kernel-cases-*.tar.zst
+          retention-days: 3
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: full-kernel-case-errors-${{ matrix.shard }}
+          path: rule54_lean_formalization/kernel-logs
+          retention-days: 7
+  final-audit:
+    needs: cases
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        with: {persist-credentials: false}
+      - run: |
+          unzip -q rule54_lean_formalization.zip
+          unzip -qo kernel-full-conversion.zip -d rule54_lean_formalization
+      - uses: actions/download-artifact@v4
+        with:
+          name: full-kernel-base
+          path: rule54_lean_formalization
+          run-id: 44566749794
+          github-token: ${{ github.token }}
+      - uses: actions/download-artifact@v4
+        with:
+          name: full-kernel-certified
+          path: rule54_lean_formalization
+          run-id: 44566749794
+          github-token: ${{ github.token }}
+      - uses: actions/download-artifact@v4
+        with: {pattern: 'full-kernel-cases-*', merge-multiple: true, path: rule54_lean_formalization}
+      - name: Install pinned Lean and restore all checked modules
+        run: |
+          set -euo pipefail
+          curl -fL --retry 3 https://github.com/leanprover/lean4/releases/download/v4.23.0/lean-4.23.0-linux.tar.zst | tar --zstd -xf -
+          echo "$GITHUB_WORKSPACE/lean-4.23.0-linux/bin" >> "$GITHUB_PATH"
+          for f in rule54_lean_formalization/*.tar.zst; do tar --zstd -xf "$f" -C rule54_lean_formalization; done
+      - name: Close all 28314 collisions and audit the unchanged final theorems
+        working-directory: rule54_lean_formalization
+        run: |
+          set -euo pipefail
+          python3 kernel_full.py assemble 2>&1 | tee full-kernel-verification.log
+          cp ../kernel_final_audit.py .
+          python3 kernel_final_audit.py 2>&1 | tee -a full-kernel-verification.log
+          python3 kernel_full.py export-source
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: full-kernel-final-audit
+          path: |
+            rule54_lean_formalization/KERNEL-VERIFICATION.txt
+            rule54_lean_formalization/KERNEL-AUDIT-REPORT.json
+            rule54_lean_formalization/KernelAuditExtras.lean
+            rule54_lean_formalization/full-kernel-verification.log
+            rule54_lean_formalization/kernel-logs
+            rule54_lean_formalization/Rule54Native.lean
+            rule54_lean_formalization/KernelAllCollisions.lean
+            rule54-kernel-verified-source.zip
+          retention-days: 7
