@@ -1,0 +1,79 @@
+name: Lean verification experiments
+
+on:
+  push:
+    branches: [kernel-verification]
+    paths: [kernel-experiment.zip, .github/workflows/kernel-verification.yml]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  kernel-only-samples:
+    name: Kernel-only collision ${{ matrix.case }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      matrix:
+        case: [small, '11228', '28313']
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Extract original proof and experimental sources
+        run: |
+          unzip -q rule54_lean_formalization.zip
+          unzip -qo kernel-experiment.zip -d rule54_lean_formalization
+      - name: Install pinned Lean 4.23.0
+        run: |
+          set -euo pipefail
+          curl --fail --location --retry 3 https://github.com/leanprover/lean4/releases/download/v4.23.0/lean-4.23.0-linux.tar.zst | tar --zstd -xf -
+          echo "$GITHUB_WORKSPACE/lean-4.23.0-linux/bin" >> "$GITHUB_PATH"
+      - name: Rebuild the original generic checker
+        working-directory: rule54_lean_formalization
+        run: |
+          set -euo pipefail
+          lean --version
+          python3 tools/check.py --jobs 2 Rule54Lean.Bulk
+      - name: Check concrete collision and audit its proof dependencies
+        working-directory: rule54_lean_formalization
+        run: python3 cloud_check.py '${{ matrix.case }}'
+      - name: Preserve logs, including failed checks
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: kernel-experiment-${{ matrix.case }}
+          path: |
+            rule54_lean_formalization/cloud-logs
+            rule54_lean_formalization/.verify/**/*.log
+          retention-days: 7
+
+  original-proof:
+    name: Original full proof (native trust disclosed)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Extract the unchanged original proof
+        run: unzip -q rule54_lean_formalization.zip
+      - name: Install pinned Lean 4.23.0
+        run: |
+          set -euo pipefail
+          curl --fail --location --retry 3 https://github.com/leanprover/lean4/releases/download/v4.23.0/lean-4.23.0-linux.tar.zst | tar --zstd -xf -
+          echo "$GITHUB_WORKSPACE/lean-4.23.0-linux/bin" >> "$GITHUB_PATH"
+      - name: Fresh source build and full axiom audit
+        working-directory: rule54_lean_formalization
+        run: |
+          set -euo pipefail
+          python3 tools/verify.py --jobs 2 2>&1 | tee original-verification.log
+      - name: Preserve the complete verification log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: original-proof-verification
+          path: rule54_lean_formalization/original-verification.log
+          retention-days: 7 
