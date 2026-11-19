@@ -56,6 +56,7 @@ report={
     'final_audit_source_commit':os.environ.get('GITHUB_SHA'),
     'axioms':axioms,
     'lean_source_sha256':sources,
+    'case_source_sha256':{f'KernelCases/C{i:05d}.lean':hashlib.sha256((root/f'KernelCases/C{i:05d}.lean').read_bytes()).hexdigest() for i in range(28314)},
 }
 full.write('KERNEL-AUDIT-REPORT.json',json.dumps(report,indent=2)+'\n')
 print('COMPLETE KERNEL AUDIT PASSED: 28314 collisions, 256 database blocks, unchanged final theorem source, standard axioms only.',flush=True)
