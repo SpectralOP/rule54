@@ -1,0 +1,120 @@
+Rule 54 formal-verification audit
+
+STATUS: INCOMPLETE. The complete native-free theorem audit has not yet passed.
+The original published proof remains at main commit
+18b93d347793c54a6b8c3f94bc932c1c980489ad.
+
+Inputs
+- Lean 4.23.0, with its bundled standard library.
+- Original proof archive SHA256:
+  fd9f9788f83e44eed7aeaeeb96def5b605c2b98e2eba6e641b4618cd1fea3ef4
+- Kernel conversion bundle SHA256:
+  b47d0af50ceeac2c69ece6efba9f844520ee6efa69bda2a6c1d11b42fefa35e1
+- Kernel build source commit:
+  3d01f99ff64fd80f06b4e0eb7591576a109d5493
+
+Completed checks
+- All 96 original Lean source files match the supplied archive byte for byte.
+- The mathematical development rebuilt from source on a clean Linux runner:
+  92 modules, without building the original native certificate module.
+- The 28,314-entry explicit enumeration equals the original collision manifest
+  by a closed kernel proof. Lean reported no axioms for this equality.
+- The general coverage lemma reports only propext, Classical.choice, Quot.sound.
+- A fresh C++ regeneration produced 1,301,192 database nodes and 28,314 roots.
+  Both files matched the supplied originals byte for byte.
+- The new literal database representation compiled completely on GitHub.
+- All 256 database block proofs passed. Their actual printed axiom reports
+  contain only propext and Quot.sound.
+- The complete database-validity theorem closed and was preserved before a
+  later, separate benchmark exceeded runner memory. The proof step itself
+  passed; the overall recovery workflow is not presented as a passed audit.
+- All 318 faster lookup modules compiled. Lean proved their lookup equivalent
+  to the original literal database. The resulting database equality and
+  validity reports contain only propext and Quot.sound.
+- Three representative collision proofs (0, 11228, 28313) passed using the
+  faster lookup and nine separate kernel decisions per original testCase.
+  Actual axiom reports contain only the three permitted standard axioms.
+  The largest measured process used approximately 10.4 GiB, so full replay
+  uses one Lean process per runner.
+
+Full replay in progress
+The immutable source for the 256-shard collision run is
+34dae1bcd37b51db333dacadd55a105903c2c31c.
+https://github.com/SpectralOP/rule54/actions/runs/44593418226
+Each successful shard preserves its actual checked Lean sources and modules.
+After all 28,314 cases pass, the dependent final job assembles the manifest,
+compiles the unchanged final theorem source, checks seven final theorem axiom
+reports and nine additional dependency reports, compares 95 original source
+files byte for byte, hashes every actual collision source, and exports an
+editable source archive. The complete audit has not passed until that job does.
+The cloud replay continues independently of this computer; the local monitor
+only records status. Its audit-status.json distinguishes workflow success from
+subsequent inspection of final logs and the exported source archive.
+
+Certificate hashes (original and regenerated)
+nodes.txt: cc44236c4f98956b31d225bfad425819e1ef956f5d85ea646b8db4a59d4c42bd
+roots.txt: 1346459e6f6ca075b3a83ed1198b1ecdfc7397ecb0305ba87048a9bb4831e48d
+
+Proof conversion
+KernelArena copies the original Arena soundness proof, replacing its array
+interface with an explicit size and lookup function. Its only additional proof
+change establishes the default value outside the declared database range.
+KernelBulk copies the original Bulk checker and soundness proofs with namespace
+and import changes. Its conclusion remains the original Manifest.Fixture.Valid.
+KernelRanges proves that checked disjoint blocks entail validity of the whole
+database. Each block and each collision is then checked by Lean's kernel.
+The original BulkCases.cover theorem and all final theorem statements remain.
+The sole original proof module to be replaced is Rule54Native.lean: its
+all_collisions theorem will alias the complete kernel certificate.
+
+Literal data definitions skip executable code generation but retain their full
+bodies for kernel reduction. They introduce no axioms. Python and C++ generators
+are untrusted; correctness must follow from the generated Lean proof terms.
+
+Required final checks
+- DONE: Every database block passes and the database validity theorem closes.
+- Every one of the 28,314 original collision obligations obtains a proof.
+- The final manifest coverage theorem closes without extra assumptions.
+- The unchanged Rule54WeakUniversality.lean compiles from these proofs.
+- simulation_iff, halting_observation, halting_iff, infinite_run,
+  simulated_at_clock, weak_universality, and rule54_simulates each report
+  only a subset of {propext, Classical.choice, Quot.sound}.
+- Inspect the additional printed common_tails axiom report.
+- Inspect the actual final audit log and exported editable source archive.
+- Verify the exported final theorem source is byte-identical to the original.
+
+Statement inspection
+The update is synchronous Rule54.cell, checked against Wolfram number 54.
+initialRow depends only on the binary machine and its finite input tape.
+common_tails fixes both reference backgrounds independently of machine/input;
+periodic_input gives their spatial periods. The elementary-cell observer reads
+the simulated control and tape, with the state count, seed length and elapsed
+time as metadata. The sampler may compute timing, but returns the data read
+from the actual CA trajectory. The infinite_run theorem concerns one orbit
+and an increasing sequence of observation times. These are weak-universality
+claims, not computation from a finite seed on a uniform background.
+
+Scope
+This is a source, certificate and Lean dependency audit. It is not journal peer
+review of the manuscript or an independent human reconstruction of the proof.
+The original final theorems still use Lean.ofReduceBool and Lean.trustCompiler;
+see original-full-axiom-audit.txt. Do not describe the native-free replacement
+as verified until all final checks above have passed.
+
+Evidence
+Original full native-trust build:
+https://github.com/SpectralOP/rule54/actions/runs/44557633834
+Source integrity and independent certificate regeneration:
+https://github.com/SpectralOP/rule54/actions/runs/44567239725
+Complete database/kernel verification:
+https://github.com/SpectralOP/rule54/actions/runs/44566749794
+Preserved complete database certificate (proof step succeeded):
+https://github.com/SpectralOP/rule54/actions/runs/44578522410
+Complete lookup equivalence proof:
+https://github.com/SpectralOP/rule54/actions/runs/44585809305
+Passed representative collision and actual axiom reports:
+https://github.com/SpectralOP/rule54/actions/runs/44588169175
+Full collision replay and dependent final theorem audit:
+https://github.com/SpectralOP/rule54/actions/runs/44593418226
+Additional largest-family collision checks:
+https://github.com/SpectralOP/rule54/actions/runs/44599212673
