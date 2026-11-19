@@ -33,6 +33,11 @@ jobs:
         run: |
           python3 - <<'PY'
           from pathlib import Path
+          for p in [Path('Rule54Lean/Arena.lean'), Path('KernelArena.lean')]:
+              text=p.read_text()
+              text=text.replace('simp [tree,h]', 'simp [tree,h] <;> rfl')
+              text=text.replace('simp [test,drop]', 'simp [test,drop] <;> rfl')
+              p.write_text(text)
           for p in [Path('Rule54FastProbe.lean'), *Path('.').glob('FastCase*Case.lean'), *Path('.').glob('FastCase*Nodes.lean')]:
               text=p.read_text()
               text='import Lean\n'+text
