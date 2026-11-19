@@ -1,10 +1,12 @@
 """Inspect complete kernel artifacts, unchanged sources and actual Lean axiom output."""
 from pathlib import Path
-import hashlib,json,os,re,zipfile
+import hashlib,json,os,re,zipfile,subprocess
 import kernel_full as full
 
 root=full.ROOT
 allowed={'propext','Classical.choice','Quot.sound'}
+version=subprocess.check_output(['lean','--version'],text=True).strip()
+assert '4.23.0' in version,version
 assert sorted(p.name for p in (root/'.verify/KernelCases').glob('C*.olean'))==[f'C{i:05d}.olean' for i in range(28314)]
 assert sorted(p.name for p in (root/'.verify/KernelNodes').glob('Block*.olean'))==[f'Block{i:04d}.olean' for i in range(256)]
 original=root.parent/'rule54_lean_formalization.zip'
@@ -39,6 +41,9 @@ full.write('KERNEL-VERIFICATION.txt',audit+'\nAdditional actual Lean axiom audit
 report={
     'status':'PASS',
     'lean_version':'4.23.0',
+    'actual_lean_version_output':version,
+    'collision_prover':'kernel_split_cases.py',
+    'certification_artifact_run_id':44578522410,
     'collision_proof_count':28314,
     'database_block_proof_count':256,
     'original_lean_sources_retained_byte_for_byte':95,
