@@ -1,0 +1,61 @@
+name: Modern kernel evaluator experiment
+on:
+  push:
+    branches: [kernel-verification]
+    paths: [.github/workflows/modern-kernel.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  proof-producing-evaluator:
+    name: Lean 4.35 kernel evaluator ${{ matrix.case }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      matrix:
+        case: [small, '11228', '28313']
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Extract experimental source snapshot
+        run: |
+          unzip -q rule54_lean_formalization.zip
+          unzip -qo kernel-experiment.zip -d rule54_lean_formalization
+      - name: Install Lean 4.35.0 for this experiment only
+        run: |
+          set -euo pipefail
+          curl --fail --location --retry 3 https://github.com/leanprover/lean4/releases/download/v4.35.0/lean-4.35.0-linux.tar.zst | tar --zstd -xf -
+          echo "$GITHUB_WORKSPACE/lean-4.35.0-linux/bin" >> "$GITHUB_PATH"
+      - name: Select proof-producing call-by-value evaluation
+        working-directory: rule54_lean_formalization
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          for p in [Path('Rule54FastProbe.lean'), *Path('.').glob('FastCase*Case.lean'), *Path('.').glob('FastCase*Nodes.lean')]:
+              text=p.read_text()
+              text='import Lean\n'+text
+              text=text.replace('maxHeartbeats 5000000','maxHeartbeats 0')
+              text=text.replace('by decide +kernel','by decide_cbv')
+              text=text.replace('by\n  simp [fixture, Manifest.writer, Manifest.ceilPow, Nat.log2]\n  decide +kernel','by decide_cbv')
+              p.write_text(text)
+          PY
+      - name: Rebuild the generic soundness proofs
+        working-directory: rule54_lean_formalization
+        run: |
+          set -euo pipefail
+          lean --version
+          python3 tools/check.py --jobs 2 Rule54Lean.Bulk
+      - name: Check collision with kernel-checkable proof production
+        working-directory: rule54_lean_formalization
+        run: python3 cloud_check.py '${{ matrix.case }}'
+      - name: Preserve all experiment logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: modern-kernel-${{ matrix.case }}
+          path: |
+            rule54_lean_formalization/cloud-logs
+            rule54_lean_formalization/.verify/**/*.log
+          retention-days: 7
