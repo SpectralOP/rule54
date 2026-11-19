@@ -33,6 +33,11 @@ jobs:
         run: |
           python3 - <<'PY'
           from pathlib import Path
+          for p in [*Path('Rule54Lean').glob('*.lean'), Path('KernelArena.lean'), Path('KernelBulk.lean')]:
+              lines=p.read_text().splitlines()
+              last=max(i for i,line in enumerate(lines) if line.startswith('import '))
+              lines[last+1:last+1]=['set_option backward.isDefEq.respectTransparency false', 'set_option backward.isDefEq.respectTransparency.types false']
+              p.write_text('\n'.join(lines)+'\n')
           for p in [Path('Rule54Lean/Arena.lean'), Path('KernelArena.lean')]:
               text=p.read_text()
               text=text.replace('simp [tree,h]', 'simp [tree,h] <;> rfl')
