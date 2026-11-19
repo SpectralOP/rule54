@@ -1,0 +1,48 @@
+Source: https://github.com/SpectralOP/rule54/actions/runs/44557633834/job/135677906624
+Fresh source build: Lean 4.23.0. Native trust remains in this ORIGINAL version.
+
+'Rule54Lean.NativeReplay.all_collisions' depends on axioms: [propext,
+ Classical.choice,
+ Lean.ofReduceBool,
+ Lean.trustCompiler,
+ Quot.sound]
+'Rule54Lean.WeakUniversality.simulation_iff' depends on axioms: [propext,
+ Classical.choice,
+ Lean.ofReduceBool,
+ Lean.trustCompiler,
+ Quot.sound]
+'Rule54Lean.WeakUniversality.halting_observation' depends on axioms: [propext,
+ Classical.choice,
+ Lean.ofReduceBool,
+ Lean.trustCompiler,
+ Quot.sound]
+'Rule54Lean.WeakUniversality.halting_iff' depends on axioms: [propext,
+ Classical.choice,
+ Lean.ofReduceBool,
+ Lean.trustCompiler,
+ Quot.sound]
+'Rule54Lean.WeakUniversality.infinite_run' depends on axioms: [propext,
+ Classical.choice,
+ Lean.ofReduceBool,
+ Lean.trustCompiler,
+ Quot.sound]
+'Rule54Lean.WeakUniversality.simulated_at_clock' depends on axioms: [propext,
+ Classical.choice,
+ Lean.ofReduceBool,
+ Lean.trustCompiler,
+ Quot.sound]
+'Rule54Lean.WeakUniversality.weak_universality' depends on axioms: [propext,
+ Classical.choice,
+ Lean.ofReduceBool,
+ Lean.trustCompiler,
+ Quot.sound]
+'Rule54Lean.WeakUniversality.rule54_simulates' depends on axioms: [propext,
+ Classical.choice,
+ Lean.ofReduceBool,
+ Lean.trustCompiler,
+ Quot.sound]
+'Rule54Lean.UniversalCheckpoint.common_tails' depends on axioms: [propext, Quot.sound]
+Verified Rule54Lean.WeakUniversality.weak_universality
+##[group]Run actions/upload-artifact@v4
+with:
+  name: original-proof-verification
