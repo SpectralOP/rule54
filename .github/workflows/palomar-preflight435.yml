@@ -22,7 +22,7 @@ jobs:
       - name: Verify and regenerate the complete source snapshot
         run: |
           set -euo pipefail
-          printf '%s  %s\n' 'a268627af16320d19d6415f39282f72f797aece5cb9d876796dca60d73be5595' 'control/lean435-port-source.zip' | sha256sum --check
+          printf '%s  %s\n' 'd9a6e4c97144423822f86d7fdfd44f35689b3538c355c751f3e83fec6db71726' 'control/lean435-port-source.zip' | sha256sum --check
           mkdir source
           unzip -q control/lean435-port-source.zip -d source
           python3 -B source/tools/generate_cluster435.py
@@ -38,7 +38,7 @@ jobs:
           git -C "$target" config user.name SpectralOP
           git -C "$target" config user.email 34817645+SpectralOP@users.noreply.github.com
           git -C "$target" add .
-          git -C "$target" commit -m "Port Rule 54 weak universality to Lean 4.35 with kernel-only collision proofs"
+          git -C "$target" commit --quiet -m "Port Rule 54 weak universality to Lean 4.35 with kernel-only collision proofs"
           git -C "$target" push origin "HEAD:refs/heads/$branch"
           echo "commit=$(git -C "$target" rev-parse HEAD)" >> "$GITHUB_OUTPUT"
           echo "branch=$branch" >> "$GITHUB_OUTPUT"
@@ -57,7 +57,7 @@ jobs:
       repository: SpectralOP/rule54
       commit: ${{ needs.source.outputs.commit }}
       pipeline_commit: 14aa8d6b3c2f14a8540605e37144560b9a00e7e7
-      request_id: r54port43501
+      request_id: r54port43502
       mode: full
       execution_profile: palomar-standard-v1
       options: '{"comparator_config_path":"comparator.json","authorization_relationship":"I am a responsible author or maintainer"}'
