@@ -1,0 +1,63 @@
+name: Freeze Lean 4.35 source and run official Palomar preflight
+on:
+  push:
+    branches: [kernel-verification]
+    paths: [.github/workflows/palomar-preflight435.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  source:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    permissions:
+      contents: write
+    outputs:
+      commit: ${{ steps.freeze.outputs.commit }}
+      branch: ${{ steps.freeze.outputs.branch }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: control
+      - name: Verify and regenerate the complete source snapshot
+        run: |
+          set -euo pipefail
+          printf '%s  %s\n' 'a268627af16320d19d6415f39282f72f797aece5cb9d876796dca60d73be5595' 'control/lean435-port-source.zip' | sha256sum --check
+          mkdir source
+          unzip -q control/lean435-port-source.zip -d source
+          python3 -B source/tools/generate_cluster435.py
+          python3 -B source/tools/audit_source435.py
+      - name: Freeze a pseudonymous source-only branch
+        id: freeze
+        run: |
+          set -euo pipefail
+          branch="lean435-palomar-${GITHUB_RUN_ID}"
+          target="$RUNNER_TEMP/rule54-source"
+          git -C control worktree add --orphan -b "$branch" "$target"
+          cp -a source/. "$target/"
+          git -C "$target" config user.name SpectralOP
+          git -C "$target" config user.email 34817645+SpectralOP@users.noreply.github.com
+          git -C "$target" add .
+          git -C "$target" commit -m "Port Rule 54 weak universality to Lean 4.35 with kernel-only collision proofs"
+          git -C "$target" push origin "HEAD:refs/heads/$branch"
+          echo "commit=$(git -C "$target" rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+          echo "branch=$branch" >> "$GITHUB_OUTPUT"
+      - name: Preserve source checks and exact revision
+        uses: actions/upload-artifact@v4
+        with:
+          name: lean435-source-preparation
+          path: source/SOURCE-AUDIT435.json
+          retention-days: 90
+  mechanical:
+    needs: source
+    uses: PalomarRegistry/PalomarSubmission/.github/workflows/submission.yml@14aa8d6b3c2f14a8540605e37144560b9a00e7e7
+    permissions:
+      contents: read
+    with:
+      repository: SpectralOP/rule54
+      commit: ${{ needs.source.outputs.commit }}
+      pipeline_commit: 14aa8d6b3c2f14a8540605e37144560b9a00e7e7
+      request_id: r54port43501
+      mode: full
+      execution_profile: palomar-standard-v1
+      options: '{"comparator_config_path":"comparator.json","authorization_relationship":"I am a responsible author or maintainer"}'
