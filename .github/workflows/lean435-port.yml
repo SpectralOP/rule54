@@ -28,7 +28,7 @@ jobs:
         run: |
           set -euo pipefail
           lean --version
-          python3 -u tools/check.py --jobs 2 Rule54Lean WordSampleSuite | tee port-build.log
+          /usr/bin/time -v python3 -u tools/check.py --jobs 2 Rule54Lean WordSampleSuite 2>&1 | tee port-build.log
       - name: Save actual port logs and checked objects
         if: always()
         uses: actions/upload-artifact@v4
@@ -37,5 +37,42 @@ jobs:
           path: |
             port/port-build.log
             port/.verify/
+          include-hidden-files: true
+          retention-days: 30
+  benchmark:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      matrix:
+        group: [0, 175, 442]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Extract source and install Lean
+        run: |
+          set -euo pipefail
+          mkdir port
+          unzip -q lean435-port-source.zip -d port
+          curl --fail --location --retry 3 https://github.com/leanprover/lean4/releases/download/v4.35.0/lean-4.35.0-linux.tar.zst | tar --zstd -xf -
+          echo "$GITHUB_WORKSPACE/lean-4.35.0-linux/bin" >> "$GITHUB_PATH"
+      - name: Regenerate compact database from the original certificate
+        working-directory: port
+        run: python3 tools/generate_cluster435.py --clusters $(( ${{ matrix.group }} / 8 ))
+      - name: Kernel-check complete representative group
+        working-directory: port
+        run: |
+          set -euo pipefail
+          module=$(printf 'KernelGroups.Proof%04d' '${{ matrix.group }}')
+          /usr/bin/time -v python3 -u tools/check.py --jobs 2 "$module" 2>&1 | tee group-build.log
+      - name: Preserve actual benchmark logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lean435-group-${{ matrix.group }}
+          path: |
+            port/group-build.log
+            port/.verify/**/*.log
           include-hidden-files: true
           retention-days: 30
