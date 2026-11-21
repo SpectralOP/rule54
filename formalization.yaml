@@ -1,0 +1,158 @@
+version: v0.4
+project:
+  name: Weak Turing universality of synchronous elementary Rule 54
+  description: A constructive simulation of arbitrary finite-state binary Turing machines
+    by synchronous elementary cellular automaton Rule 54. The machine and finite input
+    are encoded between two periodic backgrounds fixed independently of the machine
+    and input. The development includes ordinary state-and-tape readout, halting preservation
+    and reflection, and an unbounded increasing sampling clock on one cellular-automaton
+    orbit. This is weak universality; it does not establish universality from a finite
+    seed on a uniform blank background.
+  authors:
+  - SpectralOP
+  responsible_maintainers:
+  - SpectralOP
+  license: MIT
+sources:
+- title: Weak Turing universality of elementary cellular automaton Rule 54
+  authors:
+  - SpectralOP
+  id: https://github.com/SpectralOP/rule54
+  type: original-proof
+  relationship: formalizes
+  location: Manuscript main simulation theorem and Lean weak-universality declarations
+  author_endorsement: participated
+  note: Public credit names the responsible pseudonymous maintainer. According to
+    the maintainer's account, GPT-6.2 Astra produced the mathematical construction,
+    manuscript and original Lean formalization with minimal human prompting. The manuscript
+    is not journal peer reviewed.
+- title: Universality in Elementary Cellular Automata
+  authors:
+  - Matthew Cook
+  id: https://doi.org/10.25088/ComplexSystems.15.1.1
+  type: article
+  relationship: background
+  location: Complex Systems 15(1), 1-40 (2004)
+  author_endorsement: not-contacted
+  note: Rule 110 precedent; it is not a proof of Rule 54 universality.
+- title: Phenomenology of glider collisions in cellular automaton Rule 54 and associated
+    logical gates
+  authors:
+  - Genaro J. Martinez
+  - Andrew Adamatzky
+  - Harold V. McIntosh
+  id: https://doi.org/10.1016/j.chaos.2005.05.013
+  type: article
+  relationship: background
+  author_endorsement: not-contacted
+  note: Prior Rule 54 collision-based logic; no external theorem is assumed as an
+    axiom.
+- title: Complete Characterization of Structure of Rule 54
+  authors:
+  - Genaro J. Martinez
+  - Andrew Adamatzky
+  - Harold V. McIntosh
+  id: https://doi.org/10.25088/ComplexSystems.23.3.259
+  type: article
+  relationship: background
+  author_endorsement: not-contacted
+- title: A Language for Particle Interactions in Rule 54 and Other Cellular Automata
+  authors:
+  - Markus Redeker
+  id: https://doi.org/10.25088/ComplexSystems.26.1.39
+  type: article
+  relationship: background
+  author_endorsement: not-contacted
+  note: Prior formal description of Rule 54 particle interactions and historical universality
+    context.
+related_formalizations:
+- id: https://github.com/SpectralOP/rule54/actions/runs/44593418226
+  relationship: builds-on
+  note: 'Earlier Lean 4.23.0 kernel-only build of the same project: 28,314 collisions,
+    seven final theorems, and source/certificate/axiom inspection passed. This submission
+    ports and repackages that development.'
+classification:
+  arxiv:
+  - cs.FL
+  - nlin.CG
+  msc2020:
+  - 68Q80
+  - 68Q05
+status:
+  scope: Weak universality of synchronous elementary Rule 54 with two fixed periodic
+    backgrounds. Includes finite binary Turing simulation, an increasing clock for
+    a whole infinite computation, and a concrete cell-based observer. Strong universality
+    from finite seeds on a uniform blank background is outside scope. Verification
+    is by the recorded preflight; no editorial approval is claimed.
+  sorry_count: 0
+  sorry_in_definitions: 0
+  axioms:
+  - propext
+  - Classical.choice
+  - Quot.sound
+  main_results:
+  - declaration: Rule54Palomar.rule_table
+    file: Solution.lean
+    sorry_count: 0
+    comparator_config: comparator.json
+    literature_dependencies: []
+  - declaration: Rule54Palomar.fixed_backgrounds
+    file: Solution.lean
+    sorry_count: 0
+    comparator_config: comparator.json
+    literature_dependencies: []
+  - declaration: Rule54Palomar.periodic_input
+    file: Solution.lean
+    sorry_count: 0
+    comparator_config: comparator.json
+    literature_dependencies: []
+  - declaration: Rule54Palomar.weak_universality
+    file: Solution.lean
+    sorry_count: 0
+    comparator_config: comparator.json
+    literature_dependencies: []
+  - declaration: Rule54Palomar.infinite_run
+    file: Solution.lean
+    sorry_count: 0
+    comparator_config: comparator.json
+    literature_dependencies: []
+automation:
+  methods:
+  - method: autonomous
+    models:
+    - GPT-6.2 Astra
+    framework: ChatGPT
+    prompting_notes: Maintainer reports minimal human prompting, chiefly posing the
+      problem and encouraging continuation. This is reported attribution rather than
+      an independent audit of a complete generation transcript.
+  - method: agent
+    models:
+    - Codex (OpenAI; exact model version not independently recorded)
+    framework: Codex
+    tool_setup: Lean source checks, certificate regeneration, GitHub Actions, source
+      and axiom audits
+    prompting_notes: Human requested native-free verification, registry compatibility,
+      anonymity and minimal elapsed time. Codex prepared the kernel conversion, verification
+      orchestration, source port and submission documentation.
+  notes: Human role is pseudonymous project maintenance, task selection, continuation
+    prompts, publication and verification requests. AI systems receive explicit contribution
+    credit here; no independent human mathematical review is claimed.
+fidelity:
+  divergences: The Lean 4.35 port adds module/public declarations and adjusts proof
+    scripts for elaboration. The ordinary decoder is factored into the same successive
+    decoding stages without changing its computation. Compact symbolic words are proved
+    to expand to the original collision fixtures. All 28,314 original fixture obligations
+    remain required. Challenge definitions are fully specified and its five theorem
+    placeholders are deliberate Comparator statements, excluded from status.sorry_count.
+    No definition holes are used.
+review:
+  status: agent-reviewed
+  reviewers: []
+  notes: AI source, statement and dependency inspection only. No journal peer review,
+    independent expert endorsement, or independent human statement-fidelity audit
+    has been obtained. Palomar review and mechanical verification remain pending.
+acknowledgements: GPT-6.2 Astra for the original construction, manuscript and formalization;
+  Codex for kernel verification, porting and registry preparation. Lean and its standard
+  library retain their upstream authorship and licences.
+repository:
+  role: substantive-development

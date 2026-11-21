@@ -1,0 +1,140 @@
+module
+public import KernelClusters.Data0040
+@[expose] public section
+set_option backward.isDefEq.respectTransparency false
+set_option backward.isDefEq.respectTransparency.types false
+set_option maxRecDepth 200000
+set_option maxHeartbeats 0
+namespace Rule54Lean.KernelCluster0040
+open Rule54.KernelArena
+private theorem node0 : checkBlock db 73728 6=true := by decide +kernel
+private theorem node1 : checkBlock db 73792 6=true := by decide +kernel
+private theorem node2 : checkBlock db 73856 6=true := by decide +kernel
+private theorem node3 : checkBlock db 73920 6=true := by decide +kernel
+private theorem node4 : checkBlock db 73984 6=true := by decide +kernel
+private theorem node5 : checkBlock db 74048 6=true := by decide +kernel
+private theorem node6 : checkBlock db 74112 6=true := by decide +kernel
+private theorem node7 : checkBlock db 74176 6=true := by decide +kernel
+private theorem node8 : checkBlock db 74240 6=true := by decide +kernel
+private theorem node9 : checkBlock db 74304 6=true := by decide +kernel
+private theorem node10 : checkBlock db 74368 6=true := by decide +kernel
+private theorem node11 : checkBlock db 74432 6=true := by decide +kernel
+private theorem node12 : checkBlock db 74496 6=true := by decide +kernel
+private theorem node13 : checkBlock db 74560 6=true := by decide +kernel
+private theorem node14 : checkBlock db 74624 6=true := by decide +kernel
+private theorem node15 : checkBlock db 74688 6=true := by decide +kernel
+private theorem node16 : checkBlock db 74752 6=true := by decide +kernel
+private theorem node17 : checkBlock db 74816 6=true := by decide +kernel
+private theorem node18 : checkBlock db 74880 6=true := by decide +kernel
+private theorem node19 : checkBlock db 74944 6=true := by decide +kernel
+private theorem node20 : checkBlock db 75008 6=true := by decide +kernel
+private theorem node21 : checkBlock db 75072 6=true := by decide +kernel
+private theorem node22 : checkBlock db 75136 6=true := by decide +kernel
+private theorem node23 : checkBlock db 75200 6=true := by decide +kernel
+private theorem node24 : checkBlock db 75264 6=true := by decide +kernel
+private theorem node25 : checkBlock db 75328 6=true := by decide +kernel
+private theorem node26 : checkBlock db 75392 6=true := by decide +kernel
+private theorem node27 : checkBlock db 75456 6=true := by decide +kernel
+private theorem node28 : checkBlock db 75520 6=true := by decide +kernel
+private theorem node29 : checkBlock db 75584 6=true := by decide +kernel
+private theorem node30 : checkBlock db 75648 6=true := by decide +kernel
+private theorem node31 : checkBlock db 75712 6=true := by decide +kernel
+private theorem node32 : checkBlock db 75776 6=true := by decide +kernel
+private theorem node33 : checkBlock db 75840 6=true := by decide +kernel
+private theorem node34 : checkBlock db 75904 6=true := by decide +kernel
+private theorem node35 : checkBlock db 75968 6=true := by decide +kernel
+private theorem node36 : checkBlock db 76032 6=true := by decide +kernel
+private theorem node37 : checkBlock db 76096 6=true := by decide +kernel
+private theorem node38 : checkBlock db 76160 6=true := by decide +kernel
+private theorem node39 : checkBlock db 76224 6=true := checkBlock_outside db 6 76224 (by decide)
+private theorem node40 : checkBlock db 76288 6=true := checkBlock_outside db 6 76288 (by decide)
+private theorem node41 : checkBlock db 76352 6=true := checkBlock_outside db 6 76352 (by decide)
+private theorem node42 : checkBlock db 76416 6=true := checkBlock_outside db 6 76416 (by decide)
+private theorem node43 : checkBlock db 76480 6=true := checkBlock_outside db 6 76480 (by decide)
+private theorem node44 : checkBlock db 76544 6=true := checkBlock_outside db 6 76544 (by decide)
+private theorem node45 : checkBlock db 76608 6=true := checkBlock_outside db 6 76608 (by decide)
+private theorem node46 : checkBlock db 76672 6=true := checkBlock_outside db 6 76672 (by decide)
+private theorem node47 : checkBlock db 76736 6=true := checkBlock_outside db 6 76736 (by decide)
+private theorem node48 : checkBlock db 76800 6=true := checkBlock_outside db 6 76800 (by decide)
+private theorem node49 : checkBlock db 76864 6=true := checkBlock_outside db 6 76864 (by decide)
+private theorem node50 : checkBlock db 76928 6=true := checkBlock_outside db 6 76928 (by decide)
+private theorem node51 : checkBlock db 76992 6=true := checkBlock_outside db 6 76992 (by decide)
+private theorem node52 : checkBlock db 77056 6=true := checkBlock_outside db 6 77056 (by decide)
+private theorem node53 : checkBlock db 77120 6=true := checkBlock_outside db 6 77120 (by decide)
+private theorem node54 : checkBlock db 77184 6=true := checkBlock_outside db 6 77184 (by decide)
+private theorem node55 : checkBlock db 77248 6=true := checkBlock_outside db 6 77248 (by decide)
+private theorem node56 : checkBlock db 77312 6=true := checkBlock_outside db 6 77312 (by decide)
+private theorem node57 : checkBlock db 77376 6=true := checkBlock_outside db 6 77376 (by decide)
+private theorem node58 : checkBlock db 77440 6=true := checkBlock_outside db 6 77440 (by decide)
+private theorem node59 : checkBlock db 77504 6=true := checkBlock_outside db 6 77504 (by decide)
+private theorem node60 : checkBlock db 77568 6=true := checkBlock_outside db 6 77568 (by decide)
+private theorem node61 : checkBlock db 77632 6=true := checkBlock_outside db 6 77632 (by decide)
+private theorem node62 : checkBlock db 77696 6=true := checkBlock_outside db 6 77696 (by decide)
+private theorem node63 : checkBlock db 77760 6=true := checkBlock_outside db 6 77760 (by decide)
+private theorem node64 : checkBlock db 77824 6=true := checkBlock_outside db 6 77824 (by decide)
+private theorem node65 : checkBlock db 77888 6=true := checkBlock_outside db 6 77888 (by decide)
+private theorem node66 : checkBlock db 77952 6=true := checkBlock_outside db 6 77952 (by decide)
+private theorem node67 : checkBlock db 78016 6=true := checkBlock_outside db 6 78016 (by decide)
+private theorem node68 : checkBlock db 78080 6=true := checkBlock_outside db 6 78080 (by decide)
+private theorem node69 : checkBlock db 78144 6=true := checkBlock_outside db 6 78144 (by decide)
+private theorem node70 : checkBlock db 78208 6=true := checkBlock_outside db 6 78208 (by decide)
+private theorem node71 : checkBlock db 78272 6=true := checkBlock_outside db 6 78272 (by decide)
+private theorem node72 : checkBlock db 78336 6=true := checkBlock_outside db 6 78336 (by decide)
+private theorem node73 : checkBlock db 78400 6=true := checkBlock_outside db 6 78400 (by decide)
+private theorem node74 : checkBlock db 78464 6=true := checkBlock_outside db 6 78464 (by decide)
+private theorem node75 : checkBlock db 78528 6=true := checkBlock_outside db 6 78528 (by decide)
+private theorem node76 : checkBlock db 78592 6=true := checkBlock_outside db 6 78592 (by decide)
+private theorem node77 : checkBlock db 78656 6=true := checkBlock_outside db 6 78656 (by decide)
+private theorem node78 : checkBlock db 78720 6=true := checkBlock_outside db 6 78720 (by decide)
+private theorem node79 : checkBlock db 78784 6=true := checkBlock_outside db 6 78784 (by decide)
+private theorem node80 : checkBlock db 78848 6=true := checkBlock_outside db 6 78848 (by decide)
+private theorem node81 : checkBlock db 78912 6=true := checkBlock_outside db 6 78912 (by decide)
+private theorem node82 : checkBlock db 78976 6=true := checkBlock_outside db 6 78976 (by decide)
+private theorem node83 : checkBlock db 79040 6=true := checkBlock_outside db 6 79040 (by decide)
+private theorem node84 : checkBlock db 79104 6=true := checkBlock_outside db 6 79104 (by decide)
+private theorem node85 : checkBlock db 79168 6=true := checkBlock_outside db 6 79168 (by decide)
+private theorem node86 : checkBlock db 79232 6=true := checkBlock_outside db 6 79232 (by decide)
+private theorem node87 : checkBlock db 79296 6=true := checkBlock_outside db 6 79296 (by decide)
+private theorem node88 : checkBlock db 79360 6=true := checkBlock_outside db 6 79360 (by decide)
+private theorem node89 : checkBlock db 79424 6=true := checkBlock_outside db 6 79424 (by decide)
+private theorem node90 : checkBlock db 79488 6=true := checkBlock_outside db 6 79488 (by decide)
+private theorem node91 : checkBlock db 79552 6=true := checkBlock_outside db 6 79552 (by decide)
+private theorem node92 : checkBlock db 79616 6=true := checkBlock_outside db 6 79616 (by decide)
+private theorem node93 : checkBlock db 79680 6=true := checkBlock_outside db 6 79680 (by decide)
+private theorem node94 : checkBlock db 79744 6=true := checkBlock_outside db 6 79744 (by decide)
+private theorem node95 : checkBlock db 79808 6=true := checkBlock_outside db 6 79808 (by decide)
+private theorem node96 : checkBlock db 79872 6=true := checkBlock_outside db 6 79872 (by decide)
+private theorem node97 : checkBlock db 79936 6=true := checkBlock_outside db 6 79936 (by decide)
+private theorem node98 : checkBlock db 80000 6=true := checkBlock_outside db 6 80000 (by decide)
+private theorem node99 : checkBlock db 80064 6=true := checkBlock_outside db 6 80064 (by decide)
+private theorem node100 : checkBlock db 80128 6=true := checkBlock_outside db 6 80128 (by decide)
+private theorem node101 : checkBlock db 80192 6=true := checkBlock_outside db 6 80192 (by decide)
+private theorem node102 : checkBlock db 80256 6=true := checkBlock_outside db 6 80256 (by decide)
+private theorem node103 : checkBlock db 80320 6=true := checkBlock_outside db 6 80320 (by decide)
+private theorem node104 : checkBlock db 80384 6=true := checkBlock_outside db 6 80384 (by decide)
+private theorem node105 : checkBlock db 80448 6=true := checkBlock_outside db 6 80448 (by decide)
+private theorem node106 : checkBlock db 80512 6=true := checkBlock_outside db 6 80512 (by decide)
+private theorem node107 : checkBlock db 80576 6=true := checkBlock_outside db 6 80576 (by decide)
+private theorem node108 : checkBlock db 80640 6=true := checkBlock_outside db 6 80640 (by decide)
+private theorem node109 : checkBlock db 80704 6=true := checkBlock_outside db 6 80704 (by decide)
+private theorem node110 : checkBlock db 80768 6=true := checkBlock_outside db 6 80768 (by decide)
+private theorem node111 : checkBlock db 80832 6=true := checkBlock_outside db 6 80832 (by decide)
+private theorem node112 : checkBlock db 80896 6=true := checkBlock_outside db 6 80896 (by decide)
+private theorem node113 : checkBlock db 80960 6=true := checkBlock_outside db 6 80960 (by decide)
+private theorem node114 : checkBlock db 81024 6=true := checkBlock_outside db 6 81024 (by decide)
+private theorem node115 : checkBlock db 81088 6=true := checkBlock_outside db 6 81088 (by decide)
+private theorem node116 : checkBlock db 81152 6=true := checkBlock_outside db 6 81152 (by decide)
+private theorem node117 : checkBlock db 81216 6=true := checkBlock_outside db 6 81216 (by decide)
+private theorem node118 : checkBlock db 81280 6=true := checkBlock_outside db 6 81280 (by decide)
+private theorem node119 : checkBlock db 81344 6=true := checkBlock_outside db 6 81344 (by decide)
+private theorem node120 : checkBlock db 81408 6=true := checkBlock_outside db 6 81408 (by decide)
+private theorem node121 : checkBlock db 81472 6=true := checkBlock_outside db 6 81472 (by decide)
+private theorem node122 : checkBlock db 81536 6=true := checkBlock_outside db 6 81536 (by decide)
+private theorem node123 : checkBlock db 81600 6=true := checkBlock_outside db 6 81600 (by decide)
+private theorem node124 : checkBlock db 81664 6=true := checkBlock_outside db 6 81664 (by decide)
+private theorem node125 : checkBlock db 81728 6=true := checkBlock_outside db 6 81728 (by decide)
+private theorem node126 : checkBlock db 81792 6=true := checkBlock_outside db 6 81792 (by decide)
+private theorem node127 : checkBlock db 81856 6=true := checkBlock_outside db 6 81856 (by decide)
+theorem part9 : checkBlock db 73728 13=true := Bool.and_eq_true_iff.mpr ⟨Bool.and_eq_true_iff.mpr ⟨Bool.and_eq_true_iff.mpr ⟨Bool.and_eq_true_iff.mpr ⟨Bool.and_eq_true_iff.mpr ⟨Bool.and_eq_true_iff.mpr ⟨Bool.and_eq_true_iff.mpr ⟨node0,node1⟩,Bool.and_eq_true_iff.mpr ⟨node2,node3⟩⟩,Bool.and_eq_true_iff.mpr ⟨Bool.and_eq_true_iff.mpr ⟨node4,node5⟩,Bool.and_eq_true_iff.mpr ⟨node6,node7⟩⟩⟩,Bool.and_eq_true_iff.mpr ⟨Bool.and_eq_true_iff.mpr ⟨Bool.and_eq_true_iff.mpr ⟨node8,node9⟩,Bool.and_eq_true_iff.mpr ⟨node10,node11⟩⟩,Bool.and_eq_true_iff.mpr ⟨Bool.and_eq_true_iff.mpr ⟨node12,node13⟩,Bool.and_eq_true_iff.mpr ⟨node14,node15⟩⟩⟩⟩,Bool.and_eq_true_iff.mpr ⟨Bool.and_eq_true_iff.mpr ⟨Bool.and_eq_true_iff.mpr ⟨Bool.and_eq_true_iff.mpr ⟨node16,node17⟩,Bool.and_eq_true_iff.mpr ⟨node18,node19⟩⟩,Bool.and_eq_true_iff.mpr ⟨Bool.and_eq_true_iff.mpr ⟨node20,node21⟩,Bool.and_eq_true_iff.mpr ⟨node22,node23⟩⟩⟩,Bool.and_eq_true_iff.mpr ⟨Bool.and_eq_true_iff.mpr ⟨Bool.and_eq_true_iff.mpr ⟨node24,node25⟩,Bool.and_eq_true_iff.mpr ⟨node26,node27⟩⟩,Bool.and_eq_true_iff.mpr ⟨Bool.and_eq_true_iff.mpr ⟨node28,node29⟩,Bool.and_eq_true_iff.mpr ⟨node30,node31⟩⟩⟩⟩⟩,Bool.and_eq_true_iff.mpr ⟨Bool.and_eq_true_iff.mpr ⟨Bool.and_eq_true_iff.mpr ⟨Bool.and_eq_true_iff.mpr ⟨Bool.and_eq_true_iff.mpr ⟨node32,node33⟩,Bool.and_eq_true_iff.mpr ⟨node34,node35⟩⟩,Bool.and_eq_true_iff.mpr ⟨Bool.and_eq_true_iff.mpr ⟨node36,node37⟩,Bool.and_eq_true_iff.mpr ⟨node38,node39⟩⟩⟩,Bool.and_eq_true_iff.mpr ⟨Bool.and_eq_true_iff.mpr ⟨Bool.and_eq_true_iff.mpr ⟨node40,node41⟩,Bool.and_eq_true_iff.mpr ⟨node42,node43⟩⟩,Bool.and_eq_true_iff.mpr ⟨Bool.and_eq_true_iff.mpr ⟨node44,node45⟩,Bool.and_eq_true_iff.mpr ⟨node46,node47⟩⟩⟩⟩,Bool.and_eq_true_iff.mpr ⟨Bool.and_eq_true_iff.mpr ⟨Bool.and_eq_true_iff.mpr ⟨Bool.and_eq_true_iff.mpr ⟨node48,node49⟩,Bool.and_eq_true_iff.mpr ⟨node50,node51⟩⟩,Bool.and_eq_true_iff.mpr ⟨Bool.and_eq_true_iff.mpr ⟨node52,node53⟩,Bool.and_eq_true_iff.mpr ⟨node54,node55⟩⟩⟩,Bool.and_eq_true_iff.mpr ⟨Bool.and_eq_true_iff.mpr ⟨Bool.and_eq_true_iff.mpr ⟨node56,node57⟩,Bool.and_eq_true_iff.mpr ⟨node58,node59⟩⟩,Bool.and_eq_true_iff.mpr ⟨Bool.and_eq_true_iff.mpr ⟨node60,node61⟩,Bool.and_eq_true_iff.mpr ⟨node62,node63⟩⟩⟩⟩⟩⟩,Bool.and_eq_true_iff.mpr ⟨Bool.and_eq_true_iff.mpr ⟨Bool.and_eq_true_iff.mpr ⟨Bool.and_eq_true_iff.mpr ⟨Bool.and_eq_true_iff.mpr ⟨Bool.and_eq_true_iff.mpr ⟨node64,node65⟩,Bool.and_eq_true_iff.mpr ⟨node66,node67⟩⟩,Bool.and_eq_true_iff.mpr ⟨Bool.and_eq_true_iff.mpr ⟨node68,node69⟩,Bool.and_eq_true_iff.mpr ⟨node70,node71⟩⟩⟩,Bool.and_eq_true_iff.mpr ⟨Bool.and_eq_true_iff.mpr ⟨Bool.and_eq_true_iff.mpr ⟨node72,node73⟩,Bool.and_eq_true_iff.mpr ⟨node74,node75⟩⟩,Bool.and_eq_true_iff.mpr ⟨Bool.and_eq_true_iff.mpr ⟨node76,node77⟩,Bool.and_eq_true_iff.mpr ⟨node78,node79⟩⟩⟩⟩,Bool.and_eq_true_iff.mpr ⟨Bool.and_eq_true_iff.mpr ⟨Bool.and_eq_true_iff.mpr ⟨Bool.and_eq_true_iff.mpr ⟨node80,node81⟩,Bool.and_eq_true_iff.mpr ⟨node82,node83⟩⟩,Bool.and_eq_true_iff.mpr ⟨Bool.and_eq_true_iff.mpr ⟨node84,node85⟩,Bool.and_eq_true_iff.mpr ⟨node86,node87⟩⟩⟩,Bool.and_eq_true_iff.mpr ⟨Bool.and_eq_true_iff.mpr ⟨Bool.and_eq_true_iff.mpr ⟨node88,node89⟩,Bool.and_eq_true_iff.mpr ⟨node90,node91⟩⟩,Bool.and_eq_true_iff.mpr ⟨Bool.and_eq_true_iff.mpr ⟨node92,node93⟩,Bool.and_eq_true_iff.mpr ⟨node94,node95⟩⟩⟩⟩⟩,Bool.and_eq_true_iff.mpr ⟨Bool.and_eq_true_iff.mpr ⟨Bool.and_eq_true_iff.mpr ⟨Bool.and_eq_true_iff.mpr ⟨Bool.and_eq_true_iff.mpr ⟨node96,node97⟩,Bool.and_eq_true_iff.mpr ⟨node98,node99⟩⟩,Bool.and_eq_true_iff.mpr ⟨Bool.and_eq_true_iff.mpr ⟨node100,node101⟩,Bool.and_eq_true_iff.mpr ⟨node102,node103⟩⟩⟩,Bool.and_eq_true_iff.mpr ⟨Bool.and_eq_true_iff.mpr ⟨Bool.and_eq_true_iff.mpr ⟨node104,node105⟩,Bool.and_eq_true_iff.mpr ⟨node106,node107⟩⟩,Bool.and_eq_true_iff.mpr ⟨Bool.and_eq_true_iff.mpr ⟨node108,node109⟩,Bool.and_eq_true_iff.mpr ⟨node110,node111⟩⟩⟩⟩,Bool.and_eq_true_iff.mpr ⟨Bool.and_eq_true_iff.mpr ⟨Bool.and_eq_true_iff.mpr ⟨Bool.and_eq_true_iff.mpr ⟨node112,node113⟩,Bool.and_eq_true_iff.mpr ⟨node114,node115⟩⟩,Bool.and_eq_true_iff.mpr ⟨Bool.and_eq_true_iff.mpr ⟨node116,node117⟩,Bool.and_eq_true_iff.mpr ⟨node118,node119⟩⟩⟩,Bool.and_eq_true_iff.mpr ⟨Bool.and_eq_true_iff.mpr ⟨Bool.and_eq_true_iff.mpr ⟨node120,node121⟩,Bool.and_eq_true_iff.mpr ⟨node122,node123⟩⟩,Bool.and_eq_true_iff.mpr ⟨Bool.and_eq_true_iff.mpr ⟨node124,node125⟩,Bool.and_eq_true_iff.mpr ⟨node126,node127⟩⟩⟩⟩⟩⟩⟩
+#print axioms part9
+end Rule54Lean.KernelCluster0040
