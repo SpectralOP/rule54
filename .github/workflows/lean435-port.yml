@@ -1,0 +1,41 @@
+name: Lean 4.35 source port and kernel checker
+on:
+  push:
+    branches: [kernel-verification]
+    paths: [.github/workflows/lean435-port.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  port:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Extract isolated Lean 4.35 source port
+        run: |
+          mkdir port
+          unzip -q lean435-port-source.zip -d port
+      - name: Install official Lean 4.35.0
+        run: |
+          set -euo pipefail
+          curl --fail --location --retry 3 https://github.com/leanprover/lean4/releases/download/v4.35.0/lean-4.35.0-linux.tar.zst | tar --zstd -xf -
+          echo "$GITHUB_WORKSPACE/lean-4.35.0-linux/bin" >> "$GITHUB_PATH"
+      - name: Build all pure mathematical modules and compact kernel samples
+        working-directory: port
+        run: |
+          set -euo pipefail
+          lean --version
+          python3 -u tools/check.py --jobs 2 Rule54Lean WordSampleSuite | tee port-build.log
+      - name: Save actual port logs and checked objects
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lean435-port-evidence
+          path: |
+            port/port-build.log
+            port/.verify/
+          include-hidden-files: true
+          retention-days: 30
