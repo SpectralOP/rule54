@@ -1,0 +1,338 @@
+[
+  {
+    "cluster": 0,
+    "case_start": 0,
+    "case_stop": 512,
+    "database_nodes": 31291
+  },
+  {
+    "cluster": 1,
+    "case_start": 512,
+    "case_stop": 1024,
+    "database_nodes": 30445
+  },
+  {
+    "cluster": 2,
+    "case_start": 1024,
+    "case_stop": 1536,
+    "database_nodes": 31812
+  },
+  {
+    "cluster": 3,
+    "case_start": 1536,
+    "case_stop": 2048,
+    "database_nodes": 32788
+  },
+  {
+    "cluster": 4,
+    "case_start": 2048,
+    "case_stop": 2560,
+    "database_nodes": 33845
+  },
+  {
+    "cluster": 5,
+    "case_start": 2560,
+    "case_stop": 3072,
+    "database_nodes": 34786
+  },
+  {
+    "cluster": 6,
+    "case_start": 3072,
+    "case_stop": 3584,
+    "database_nodes": 35426
+  },
+  {
+    "cluster": 7,
+    "case_start": 3584,
+    "case_stop": 4096,
+    "database_nodes": 35867
+  },
+  {
+    "cluster": 8,
+    "case_start": 4096,
+    "case_stop": 4608,
+    "database_nodes": 36201
+  },
+  {
+    "cluster": 9,
+    "case_start": 4608,
+    "case_stop": 5120,
+    "database_nodes": 37414
+  },
+  {
+    "cluster": 10,
+    "case_start": 5120,
+    "case_stop": 5632,
+    "database_nodes": 37693
+  },
+  {
+    "cluster": 11,
+    "case_start": 5632,
+    "case_stop": 6144,
+    "database_nodes": 37866
+  },
+  {
+    "cluster": 12,
+    "case_start": 6144,
+    "case_stop": 6656,
+    "database_nodes": 38525
+  },
+  {
+    "cluster": 13,
+    "case_start": 6656,
+    "case_stop": 7168,
+    "database_nodes": 38554
+  },
+  {
+    "cluster": 14,
+    "case_start": 7168,
+    "case_stop": 7680,
+    "database_nodes": 38788
+  },
+  {
+    "cluster": 15,
+    "case_start": 7680,
+    "case_stop": 8192,
+    "database_nodes": 39168
+  },
+  {
+    "cluster": 16,
+    "case_start": 8192,
+    "case_stop": 8704,
+    "database_nodes": 39345
+  },
+  {
+    "cluster": 17,
+    "case_start": 8704,
+    "case_stop": 9216,
+    "database_nodes": 39457
+  },
+  {
+    "cluster": 18,
+    "case_start": 9216,
+    "case_stop": 9728,
+    "database_nodes": 40473
+  },
+  {
+    "cluster": 19,
+    "case_start": 9728,
+    "case_stop": 10240,
+    "database_nodes": 40698
+  },
+  {
+    "cluster": 20,
+    "case_start": 10240,
+    "case_stop": 10752,
+    "database_nodes": 40690
+  },
+  {
+    "cluster": 21,
+    "case_start": 10752,
+    "case_stop": 11264,
+    "database_nodes": 43931
+  },
+  {
+    "cluster": 22,
+    "case_start": 11264,
+    "case_stop": 11776,
+    "database_nodes": 34528
+  },
+  {
+    "cluster": 23,
+    "case_start": 11776,
+    "case_stop": 12288,
+    "database_nodes": 43026
+  },
+  {
+    "cluster": 24,
+    "case_start": 12288,
+    "case_stop": 12800,
+    "database_nodes": 47541
+  },
+  {
+    "cluster": 25,
+    "case_start": 12800,
+    "case_stop": 13312,
+    "database_nodes": 54211
+  },
+  {
+    "cluster": 26,
+    "case_start": 13312,
+    "case_stop": 13824,
+    "database_nodes": 55008
+  },
+  {
+    "cluster": 27,
+    "case_start": 13824,
+    "case_stop": 14336,
+    "database_nodes": 58474
+  },
+  {
+    "cluster": 28,
+    "case_start": 14336,
+    "case_stop": 14848,
+    "database_nodes": 61646
+  },
+  {
+    "cluster": 29,
+    "case_start": 14848,
+    "case_stop": 15360,
+    "database_nodes": 64579
+  },
+  {
+    "cluster": 30,
+    "case_start": 15360,
+    "case_stop": 15872,
+    "database_nodes": 66259
+  },
+  {
+    "cluster": 31,
+    "case_start": 15872,
+    "case_stop": 16384,
+    "database_nodes": 65824
+  },
+  {
+    "cluster": 32,
+    "case_start": 16384,
+    "case_stop": 16896,
+    "database_nodes": 67275
+  },
+  {
+    "cluster": 33,
+    "case_start": 16896,
+    "case_stop": 17408,
+    "database_nodes": 69400
+  },
+  {
+    "cluster": 34,
+    "case_start": 17408,
+    "case_stop": 17920,
+    "database_nodes": 70329
+  },
+  {
+    "cluster": 35,
+    "case_start": 17920,
+    "case_stop": 18432,
+    "database_nodes": 72690
+  },
+  {
+    "cluster": 36,
+    "case_start": 18432,
+    "case_stop": 18944,
+    "database_nodes": 74912
+  },
+  {
+    "cluster": 37,
+    "case_start": 18944,
+    "case_stop": 19456,
+    "database_nodes": 75619
+  },
+  {
+    "cluster": 38,
+    "case_start": 19456,
+    "case_stop": 19968,
+    "database_nodes": 76970
+  },
+  {
+    "cluster": 39,
+    "case_start": 19968,
+    "case_stop": 20480,
+    "database_nodes": 77897
+  },
+  {
+    "cluster": 40,
+    "case_start": 20480,
+    "case_stop": 20992,
+    "database_nodes": 76193
+  },
+  {
+    "cluster": 41,
+    "case_start": 20992,
+    "case_stop": 21504,
+    "database_nodes": 77124
+  },
+  {
+    "cluster": 42,
+    "case_start": 21504,
+    "case_stop": 22016,
+    "database_nodes": 77190
+  },
+  {
+    "cluster": 43,
+    "case_start": 22016,
+    "case_stop": 22528,
+    "database_nodes": 77651
+  },
+  {
+    "cluster": 44,
+    "case_start": 22528,
+    "case_stop": 23040,
+    "database_nodes": 80690
+  },
+  {
+    "cluster": 45,
+    "case_start": 23040,
+    "case_stop": 23552,
+    "database_nodes": 80585
+  },
+  {
+    "cluster": 46,
+    "case_start": 23552,
+    "case_stop": 24064,
+    "database_nodes": 80999
+  },
+  {
+    "cluster": 47,
+    "case_start": 24064,
+    "case_stop": 24576,
+    "database_nodes": 81414
+  },
+  {
+    "cluster": 48,
+    "case_start": 24576,
+    "case_stop": 25088,
+    "database_nodes": 81764
+  },
+  {
+    "cluster": 49,
+    "case_start": 25088,
+    "case_stop": 25600,
+    "database_nodes": 83870
+  },
+  {
+    "cluster": 50,
+    "case_start": 25600,
+    "case_stop": 26112,
+    "database_nodes": 85860
+  },
+  {
+    "cluster": 51,
+    "case_start": 26112,
+    "case_stop": 26624,
+    "database_nodes": 86021
+  },
+  {
+    "cluster": 52,
+    "case_start": 26624,
+    "case_stop": 27136,
+    "database_nodes": 86560
+  },
+  {
+    "cluster": 53,
+    "case_start": 27136,
+    "case_stop": 27648,
+    "database_nodes": 86912
+  },
+  {
+    "cluster": 54,
+    "case_start": 27648,
+    "case_stop": 28160,
+    "database_nodes": 86594
+  },
+  {
+    "cluster": 55,
+    "case_start": 28160,
+    "case_stop": 28314,
+    "database_nodes": 33071
+  }
+]

@@ -1,0 +1,55 @@
+name = "rule54"
+version = "0.2.0"
+moreLeanArgs = ["-s", "262144", "-j1"]
+defaultTargets = ["Solution"]
+
+[[lean_lib]]
+name = "Rule54Lean"
+
+[[lean_lib]]
+name = "Rule54Data"
+
+[[lean_lib]]
+name = "Rule54Native"
+
+[[lean_lib]]
+name = "Rule54WeakUniversality"
+
+[[lean_lib]]
+name = "KernelArena"
+
+[[lean_lib]]
+name = "KernelBulk"
+
+[[lean_lib]]
+name = "KernelRanges"
+
+[[lean_lib]]
+name = "KernelWords"
+
+[[lean_lib]]
+name = "KernelWordWindows"
+
+[[lean_lib]]
+name = "KernelWordFixtures"
+
+[[lean_lib]]
+name = "KernelCompactTable"
+
+[[lean_lib]]
+name = "KernelClusters"
+
+[[lean_lib]]
+name = "KernelNodeParts"
+
+[[lean_lib]]
+name = "KernelGroups"
+
+[[lean_lib]]
+name = "KernelAllCollisions"
+
+[[lean_lib]]
+name = "Challenge"
+
+[[lean_lib]]
+name = "Solution"

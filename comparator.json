@@ -1,0 +1,16 @@
+{
+  "challenge_module": "Challenge",
+  "solution_module": "Solution",
+  "theorem_names": [
+    "Rule54Palomar.rule_table",
+    "Rule54Palomar.fixed_backgrounds",
+    "Rule54Palomar.periodic_input",
+    "Rule54Palomar.weak_universality",
+    "Rule54Palomar.infinite_run"
+  ],
+  "permitted_axioms": [
+    "propext",
+    "Classical.choice",
+    "Quot.sound"
+  ]
+}
